@@ -6,7 +6,7 @@ export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <nav className="bg-[#FDEDD4] py-3 px-6 md:px-[141px] flex items-center justify-between">
+    <nav className="bg-[#FDEDD4] py-3 px-6 md:px-10 xl:px-[141px]  flex items-center justify-between">
       {/* Logo */}
       <div className="flex items-center gap-2">
         <img src={Icon} alt="Icon" className="h-8 w-8" />
@@ -14,7 +14,7 @@ export default function Navbar() {
       </div>
 
       {/* Desktop Navigation */}
-      <ul className="hidden md:flex items-center gap-10 text-black">
+      <ul className="hidden md:flex items-center gap-10  text-black">
         <li className="hover:font-medium cursor-pointer">Home</li>
         <li className="hover:font-medium cursor-pointer">Breeds</li>
         <li className="hover:font-medium cursor-pointer">Accessories</li>
