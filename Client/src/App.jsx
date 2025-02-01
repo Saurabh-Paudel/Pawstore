@@ -1,7 +1,7 @@
 import React from "react";
 import "./index.css";
 import RootLayout from "./Components/RootComponents/RootLayout";
-import Home from "./Pages/Home";
+import Home from "./Pages/Client/Home";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 export default function App() {
   let router;
