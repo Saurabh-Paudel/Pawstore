@@ -2,10 +2,10 @@ import React from "react";
 
 export default function About() {
   return (
-    <div className="bg-orange-50 min-h-screen py-12">
+    <div className="min-h-screen py-12">
       <div className="max-w-6xl mx-auto px-6">
         {/* Heading */}
-        <h1 className="text-4xl font-bold text-center text-orange-700 mb-6">
+        <h1 className="text-4xl font-bold text-center text-black mb-6">
           About Pawstore
         </h1>
 
