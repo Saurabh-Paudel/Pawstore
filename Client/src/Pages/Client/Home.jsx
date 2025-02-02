@@ -3,7 +3,7 @@ import HomeBanner from "../../Components/HomepageComponent/HomeBanner";
 import BreedSection from "../../Components/HomepageComponent/BreedSection";
 import PetProducts from "../../Components/HomepageComponent/PetProducts";
 import BlogSection from "../../Components/HomepageComponent/BlogSection";
-import SubscriptionSection from "../../Components/HomepageComponent/SubscriptionSection";
+import NewsletterSection from "../../Components/HomepageComponent/NewsletterSection";
 function Home() {
   return (
     <>
@@ -11,7 +11,7 @@ function Home() {
       <BreedSection />
       <PetProducts />
       <BlogSection />
-      <SubscriptionSection />
+      <NewsletterSection />
     </>
   );
 }

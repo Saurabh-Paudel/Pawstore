@@ -1,5 +1,6 @@
 import React from "react";
 import { FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -12,8 +13,12 @@ export default function Footer() {
           <div>
             <p className="font-semibold text-xl mb-4">Useful Links</p>
             <ul className="space-y-2 text-lg">
-              <li>Home</li>
-              <li>About</li>
+              <li>
+                <Link to="/">Home</Link>
+              </li>
+              <li>
+                <Link to="/about">About</Link>
+              </li>
               <li>Services</li>
               <li>Team</li>
               <li>FAQs</li>

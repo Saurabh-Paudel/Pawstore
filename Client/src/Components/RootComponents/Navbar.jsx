@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Icon from "../../assets/icon.png";
 import { BiSearch, BiMenu, BiX } from "react-icons/bi";
+import { Link } from "react-router-dom";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -8,14 +9,18 @@ export default function Navbar() {
   return (
     <nav className="bg-[#FDEDD4] py-3 px-6 md:px-10 xl:px-[141px]  flex items-center justify-between">
       {/* Logo */}
-      <div className="flex items-center gap-2">
-        <img src={Icon} alt="Icon" className="h-8 w-8" />
-        <p className="font-poppins font-bold text-lg">Pawstore</p>
-      </div>
+      <Link to="/">
+        <div className="flex items-center gap-2">
+          <img src={Icon} alt="Icon" className="h-8 w-8" />
+          <p className="font-poppins font-bold text-lg">Pawstore</p>
+        </div>
+      </Link>
 
       {/* Desktop Navigation */}
       <ul className="hidden md:flex items-center gap-10  text-black">
-        <li className="hover:font-medium cursor-pointer">Home</li>
+        <li className="hover:font-medium">
+          <Link to="/">Home</Link>
+        </li>
         <li className="hover:font-medium cursor-pointer">Breeds</li>
         <li className="hover:font-medium cursor-pointer">Accessories</li>
         <li className="hover:font-medium cursor-pointer">Blog</li>

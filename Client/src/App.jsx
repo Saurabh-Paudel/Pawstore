@@ -3,6 +3,7 @@ import "./index.css";
 import RootLayout from "./Components/RootComponents/RootLayout";
 import Home from "./Pages/Client/Home";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import About from "./Pages/Client/About";
 export default function App() {
   let router;
 
@@ -12,9 +13,10 @@ export default function App() {
       element: <RootLayout />,
       children: [
         {
-          path: "/",
+          path: "",
           element: <Home />,
         },
+        { path: "about", element: <About /> },
       ],
     },
   ]);
