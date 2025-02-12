@@ -14,6 +14,9 @@ import ContactUs from "./Pages/Client/Contact";
 import Breed from "./Pages/Client/Breed";
 import AccessoriesPage from "./Pages/Client/Accessories";
 import BlogSection from "./Pages/Client/Blog";
+import Login from "./Pages/Authentication/Login";
+import SignUp from "./Pages/Authentication/SignUp";
+
 export default function App() {
   let router;
   router = createBrowserRouter([
@@ -60,6 +63,14 @@ export default function App() {
         {
           path: "blogs",
           element: <BlogSection />,
+        },
+        {
+          path: "login",
+          element: <Login />,
+        },
+        {
+          path: "signup",
+          element: <SignUp />,
         },
       ],
     },
