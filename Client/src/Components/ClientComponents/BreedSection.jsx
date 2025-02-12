@@ -20,7 +20,7 @@ export default function BreedSection() {
   ];
 
   return (
-    <div className="my-20 px-6 md:px-16 xl:px-[141px]">
+    <div id="breeds-section" className="my-20 px-6 md:px-16 xl:px-[141px]">
       {/* Section Title */}
       <div className="text-center font-poppins mb-10">
         <p className="text-4xl font-bold mb-4">Dog Breeds</p>

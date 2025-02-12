@@ -3,6 +3,10 @@ import { FaFacebookF, FaInstagram, FaYoutube } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
+  const scrollToTop = () => {
+    window.scrollTo(0, 0); // Scroll to top when link is clicked
+  };
+
   return (
     <div className="bg-[#F6FAFF] w-full px-6 text-center md:px-10 lg:px-[141px] flex flex-col justify-between font-poppins">
       {/* Main Content */}
@@ -14,18 +18,40 @@ export default function Footer() {
             <p className="font-semibold text-xl mb-4">Useful Links</p>
             <ul className="space-y-2 text-lg">
               <li>
-                <Link to="/">Home</Link>
+                <Link to="/" onClick={scrollToTop}>
+                  Home
+                </Link>
               </li>
               <li>
-                <Link to="/about">About</Link>
+                <Link to="/about" onClick={scrollToTop}>
+                  About
+                </Link>
               </li>
               <li>
-                <Link to="/services">Services</Link>
+                <Link to="/services" onClick={scrollToTop}>
+                  Services
+                </Link>
               </li>
-              <li>Team</li>
-              <li>FAQs</li>
-              <li>Careers</li>
-              <li>Contact Us</li>
+              <li>
+                <Link to="/team" onClick={scrollToTop}>
+                  Team
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" onClick={scrollToTop}>
+                  FAQs
+                </Link>
+              </li>
+              <li>
+                <Link to="/careers" onClick={scrollToTop}>
+                  Career
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" onClick={scrollToTop}>
+                  Contact Us
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -41,7 +67,7 @@ export default function Footer() {
         </div>
 
         {/* Google Map */}
-        <div className="lg:w-[600] lg:h-[270px] h-auto w-auto sm:border sm:rounded-[10px] ">
+        <div className="lg:w-[600] lg:h-[270px] h-auto w-auto sm:rounded-[10px] ">
           <iframe
             title="Google Map"
             className="lg:w-[500px] xl:w-[600px] lg:h-[269px] h-auto w-auto border-0 rounded-[10px]"
@@ -54,7 +80,7 @@ export default function Footer() {
       </div>
 
       {/* Footer Bottom */}
-      <div className="w-full py-6 flex-col  md:flex-row flex items-center md:items-center md:gap-4  md:justify-between text-base text-[#050706]">
+      <div className="w-full py-6 flex-col md:flex-row flex items-center md:items-center md:gap-4  md:justify-between text-base text-[#050706]">
         <p className="mb-2 text-center">Copyright @ 2021 GrandmaBakery</p>
 
         {/* Social Icons */}
