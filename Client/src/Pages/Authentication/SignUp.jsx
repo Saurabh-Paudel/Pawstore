@@ -1,25 +1,59 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Signup = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    role: "",
+    role: "buyer",
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Signup Data:", formData);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Signup successful!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+        setTimeout(() => {
+          navigate("/login");
+        }, 3000);
+      } else {
+        toast.error(data.message || "Signup failed", {
+          position: "top-right",
+        });
+      }
+    } catch (error) {
+      console.error("Error during signup:", error);
+      toast.error("Something went wrong, please try again later.", {
+        position: "top-right",
+      });
+    }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-r from-[#FDEDD4] to-[#FFD1A4] p-6">
+    <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-md bg-white/90 backdrop-blur-lg shadow-2xl rounded-2xl p-8 border border-white/50">
         <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
           Create an Account ✨
@@ -98,6 +132,7 @@ const Signup = () => {
           </Link>
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 };
