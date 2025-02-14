@@ -14,7 +14,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading indicator
+    setLoading(true);
 
     try {
       const response = await fetch("http://localhost:8000/api/auth/login", {
@@ -28,37 +28,29 @@ const Login = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success("Login successful!", {
-          position: "top-right",
-          autoClose: 3000,
-        });
+        toast.success("Login successful!", { position: "top-right", autoClose: 3000 });
 
-        // Store token, email, name, and role in localStorage
+        // Store user data in localStorage
         const userData = {
           token: data.token,
           email: data.user.email,
           name: data.user.name,
           role: data.user.role,
         };
-
         localStorage.setItem("userData", JSON.stringify(userData));
 
-        // Redirect to home or dashboard
-        navigate("/"); // Adjust the route as needed
+        // 🔥 Dispatch custom event to update Navbar immediately
+        window.dispatchEvent(new Event("userDataUpdated"));
+
+        navigate("/");
       } else {
-        toast.error(data.message || "Login failed", {
-          position: "top-right",
-        });
+        toast.error(data.message || "Login failed", { position: "top-right" });
       }
     } catch (error) {
       console.error("Login Error:", error);
-      toast.error("Something went wrong, please try again later.", {
-        position: "top-right",
-      });
+      toast.error("Something went wrong, please try again later.", { position: "top-right" });
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 3000); // End loading indicator
+      setLoading(false);
     }
   };
 
@@ -100,7 +92,7 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:bg-orange-600 transform hover:scale-105 transition duration-300"
-            disabled={loading} // Disable button during loading
+            disabled={loading}
           >
             {loading ? "Logging in..." : "Login"}
           </button>
