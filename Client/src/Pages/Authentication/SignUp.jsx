@@ -5,13 +5,13 @@ import "react-toastify/dist/ReactToastify.css";
 
 const Signup = () => {
   const navigate = useNavigate();
-
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     role: "buyer",
   });
+  const [errors, setErrors] = useState([]); // To store validation errors
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -40,9 +40,17 @@ const Signup = () => {
           navigate("/login");
         }, 3000);
       } else {
-        toast.error(data.message || "Signup failed", {
-          position: "top-right",
-        });
+        // Check if there are validation errors
+        if (data.errors) {
+          setErrors(data.errors); // Set errors to state
+          data.errors.forEach((error) =>
+            toast.error(error.msg, { position: "top-right" })
+          );
+        } else {
+          toast.error(data.message || "Signup failed", {
+            position: "top-right",
+          });
+        }
       }
     } catch (error) {
       console.error("Error during signup:", error);
@@ -72,6 +80,12 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your name"
             />
+            {/* Show error if name is invalid */}
+            {errors.some((error) => error.param === "name") && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.find((error) => error.param === "name").msg}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">
@@ -86,6 +100,12 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your email"
             />
+            {/* Show error if email is invalid */}
+            {errors.some((error) => error.param === "email") && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.find((error) => error.param === "email").msg}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">
@@ -100,6 +120,12 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your password"
             />
+            {/* Show error if password is invalid */}
+            {errors.some((error) => error.param === "password") && (
+              <p className="text-red-500 text-sm mt-1">
+                {errors.find((error) => error.param === "password").msg}
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">

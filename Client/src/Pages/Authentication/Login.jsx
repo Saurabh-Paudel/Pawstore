@@ -1,16 +1,65 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    //logic to be added
+    setLoading(true); // Start loading indicator
+
+    try {
+      const response = await fetch("http://localhost:8000/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success("Login successful!", {
+          position: "top-right",
+          autoClose: 3000,
+        });
+
+        // Store token, email, name, and role in localStorage
+        const userData = {
+          token: data.token,
+          email: data.user.email,
+          name: data.user.name,
+          role: data.user.role,
+        };
+
+        localStorage.setItem("userData", JSON.stringify(userData));
+
+        // Redirect to home or dashboard
+        navigate("/"); // Adjust the route as needed
+      } else {
+        toast.error(data.message || "Login failed", {
+          position: "top-right",
+        });
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      toast.error("Something went wrong, please try again later.", {
+        position: "top-right",
+      });
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 3000); // End loading indicator
+    }
   };
 
   return (
@@ -51,8 +100,9 @@ const Login = () => {
           <button
             type="submit"
             className="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold text-lg shadow-md hover:bg-orange-600 transform hover:scale-105 transition duration-300"
+            disabled={loading} // Disable button during loading
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
         <p className="text-center text-gray-700 mt-4">
@@ -65,6 +115,7 @@ const Login = () => {
           </Link>
         </p>
       </div>
+      <ToastContainer />
     </div>
   );
 };
