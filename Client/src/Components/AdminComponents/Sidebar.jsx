@@ -1,4 +1,6 @@
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux"; // Import dispatch if using Redux
 import {
   FaTachometerAlt,
   FaBox,
@@ -6,150 +8,163 @@ import {
   FaPaw,
   FaCogs,
   FaSignOutAlt,
-  FaEnvelopeOpenText, // Newsletter Icon
-  FaBlogger, // Blog Icon
+  FaEnvelopeOpenText,
+  FaBlogger,
   FaCartPlus,
 } from "react-icons/fa";
-import { useState, useEffect } from "react";
-import { MdKeyboardArrowDown } from "react-icons/md";
-import { toast, ToastContainer } from "react-toastify";
-import { useDispatch } from "react-redux";
-import { logout } from "../../redux/slices/userSlice"; // Import logoutUser
+import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
+import { logout } from "../../redux/slices/userSlice";
 
 const Sidebar = () => {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [isSalesOpen, setIsSalesOpen] = useState(false);
 
-  // Toggle sales menu with persistent state
-  const toggleSalesMenu = () => {
-    const newSalesMenuState = !isSalesOpen;
-    setIsSalesOpen(newSalesMenuState);
-    localStorage.setItem("salesMenuOpen", JSON.stringify(newSalesMenuState)); // Persist in localStorage
-  };
-
-  // Load sales menu state from localStorage
-  useEffect(() => {
-    const savedState = localStorage.getItem("salesMenuOpen");
-    if (savedState !== null) {
-      setIsSalesOpen(JSON.parse(savedState));
-    }
-  }, []);
-
   const handleLogout = () => {
+    // Clear user session from local storage
     localStorage.removeItem("user");
-    dispatch(logout()); // Use logoutUser instead of setUser
+
+    // Dispatch the logout action (assuming you have a logout action in your Redux store)
+    dispatch(logout());
+
+    // Redirect to the login page
     navigate("/login");
   };
 
+  const toggleSalesMenu = () => {
+    setIsSalesOpen(!isSalesOpen);
+  };
+
   return (
-    <div className="w-64 max-h-full bg-gray-100 text-gray-800 p-5 shadow-md">
-      <h2 className="text-xl font-bold mb-6 text-blue-600">Admin Dashboard</h2>
-      <nav>
+    <div className="bg-gray-800 text-white h-screen w-64">
+      <div className="p-4">
+        <h2 className="text-xl font-bold mb-6">Dashboard</h2>
         <ul className="space-y-4">
           {/* Dashboard Menu */}
-          <li className="flex items-center space-x-3 hover:bg-blue-200 p-2 rounded-lg transition-all">
-            <FaTachometerAlt className="text-blue-600" />
-            <Link to="/admin" className="flex-1 text-gray-800">
-              Dashboard
+          <li>
+            <Link
+              to="/admin"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaTachometerAlt className="text-xl" />
+              <span>Dashboard</span>
             </Link>
           </li>
 
           {/* Dog Breeds Menu */}
-          <li className="flex items-center space-x-3 hover:bg-blue-200 p-2 rounded-lg transition-all">
-            <FaPaw className="text-blue-600" />
-            <Link to="/admin/dog-breeds" className="flex-1 text-gray-800">
-              Dog Breeds
+          <li>
+            <Link
+              to="/admin/dog-breeds"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaPaw className="text-xl" />
+              <span>Dog Breeds</span>
             </Link>
           </li>
 
           {/* Products Menu */}
-          <li className="flex items-center space-x-3 hover:bg-blue-200 p-2 rounded-lg transition-all">
-            <FaBox className="text-blue-600" />
-            <Link to="/admin/pet-products" className="flex-1 text-gray-800">
-              Products
+          <li>
+            <Link
+              to="/admin/pet-products"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaBox className="text-xl" />
+              <span>Products</span>
             </Link>
           </li>
 
           {/* Blog Menu */}
-          <li className="flex items-center space-x-3 hover:bg-blue-200 p-2 rounded-lg transition-all">
-            <FaBlogger className="text-blue-600" />
-            <Link to="/admin/blog" className="flex-1 text-gray-800">
-              Blog
+          <li>
+            <Link
+              to="/admin/blog"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaBlogger className="text-xl" />
+              <span>Blog</span>
             </Link>
           </li>
 
           {/* Newsletters Menu */}
-          <li className="flex items-center space-x-3 hover:bg-blue-200 p-2 rounded-lg transition-all">
-            <FaEnvelopeOpenText className="text-blue-600" />
-            <Link to="/admin/newsletters" className="flex-1 text-gray-800">
-              Newsletters
+          <li>
+            <Link
+              to="/admin/newsletters"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaEnvelopeOpenText className="text-xl" />
+              <span>Newsletters</span>
             </Link>
           </li>
 
-          {/* Users Menu */}
-          <li className="flex items-center space-x-3 hover:bg-blue-200 p-2 rounded-lg transition-all">
-            <FaUserAlt className="text-blue-600" />
-            <Link to="/admin/users" className="flex-1 text-gray-800">
-              Users
-            </Link>
-          </li>
-
-          {/* Settings Menu */}
-          <li className="flex items-center space-x-3 hover:bg-blue-200 p-2 rounded-lg transition-all">
-            <FaCogs className="text-blue-600" />
-            <Link to="/admin/settings" className="flex-1 text-gray-800">
-              Settings
-            </Link>
-          </li>
-
-          {/* Sales Menu (with submenus) */}
+          {/* Sales (Collapsible Menu) */}
           <li
             onClick={toggleSalesMenu}
-            className="flex items-center justify-between space-x-3 hover:bg-blue-200 p-2 rounded-lg cursor-pointer transition-all"
+            className="flex items-center justify-between space-x-3 hover:bg-gray-700 p-2 rounded cursor-pointer"
           >
-            <div className="flex items-center gap-2">
-              <FaCartPlus className="text-blue-600" />
-              <span className="flex-1 text-gray-800">Sales</span>
+            <div className="flex items-center space-x-3">
+              <FaCartPlus className="text-xl" />
+              <span>Sales</span>
             </div>
-            <div>
-              <MdKeyboardArrowDown className="text-blue-600 text-xl" />
-            </div>
+            {isSalesOpen ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
           </li>
+
+          {/* Sales Submenu */}
           {isSalesOpen && (
             <ul className="ml-6 space-y-2">
-              {/* Dogs Submenu */}
-              <li className="flex items-center space-x-3 hover:bg-blue-100 p-2 rounded-lg transition-all">
-                <FaPaw className="text-blue-600" />
-                <Link to="/admin/sales/dogs" className="text-gray-800">
-                  Dogs
+              <li>
+                <Link
+                  to="/admin/sales/dogs"
+                  className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+                >
+                  <FaPaw className="text-xl" />
+                  <span>Dogs</span>
                 </Link>
               </li>
-
-              {/* Dog Accessories Submenu */}
-              <li className="flex items-center space-x-3 hover:bg-blue-100 p-2 rounded-lg transition-all">
-                <FaBox className="text-blue-600" />
+              <li>
                 <Link
                   to="/admin/sales/dog-accessories"
-                  className="text-gray-800"
+                  className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
                 >
-                  Dog Accessories
+                  <FaBox className="text-xl" />
+                  <span>Dog Accessories</span>
                 </Link>
               </li>
             </ul>
           )}
 
+          {/* Users Menu */}
+          <li>
+            <Link
+              to="/admin/users"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaUserAlt className="text-xl" />
+              <span>Users</span>
+            </Link>
+          </li>
+
+          {/* Settings Menu */}
+          <li>
+            <Link
+              to="/admin/settings"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaCogs className="text-xl" />
+              <span>Settings</span>
+            </Link>
+          </li>
+
           {/* Logout Menu */}
-          <li
-            onClick={handleLogout}
-            className="flex items-center space-x-3 cursor-pointer hover:bg-red-200 p-2 rounded-lg transition-all"
-          >
-            <FaSignOutAlt className="text-red-600" />
-            <span className="text-gray-800">Logout</span>
+          <li>
+            <button
+              onClick={handleLogout}
+              className="flex items-center space-x-3 hover:bg-red-600 p-2 rounded w-full"
+            >
+              <FaSignOutAlt className="text-xl" />
+              <span>Logout</span>
+            </button>
           </li>
         </ul>
-      </nav>
-      <ToastContainer />
+      </div>
     </div>
   );
 };

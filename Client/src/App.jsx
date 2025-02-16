@@ -6,6 +6,7 @@ import { setUser } from "./redux/slices/userSlice";
 // Layouts
 import RootLayout from "./Components/RootComponents/RootLayout";
 import SellerLayout from "./Components/AdminComponents/SellerLayout";
+import BuyerLayout from "./Components/UserComponent/BuyerLyout";
 
 // Client Pages
 import Home from "./Pages/Client/Home";
@@ -21,8 +22,10 @@ import BlogSection from "./Pages/Client/Blog";
 import Login from "./Pages/Authentication/Login";
 import SignUp from "./Pages/Authentication/SignUp";
 
-// Dashboard Pages
+// UserDashboard Pages
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
+
+//AdminDashboard Pages
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 
 const App = () => {
@@ -62,7 +65,9 @@ const App = () => {
       </Route>
 
       {userData.token && userData.role === "buyer" && (
-        <Route path="/dashboard" element={<UserDashboard />} />
+        <Route path="/dashboard" element={<BuyerLayout />}>
+          <Route path="" element={<UserDashboard />} />
+        </Route>
       )}
 
       {userData.token && userData.role === "admin" && (
