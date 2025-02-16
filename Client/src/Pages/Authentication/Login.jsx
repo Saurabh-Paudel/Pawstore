@@ -1,9 +1,13 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../redux/slices/userSlice";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Login = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
@@ -17,38 +21,35 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      const response = await axios.post(
+        "http://localhost:8000/api/auth/login",
+        formData
+      );
+      const data = response.data;
 
-      const data = await response.json();
+      if (response.status === 200) {
+        toast.success("Login successful!");
 
-      if (response.ok) {
-        toast.success("Login successful!", { position: "top-right", autoClose: 3000 });
-
-        // Store user data in localStorage
         const userData = {
           token: data.token,
           email: data.user.email,
           name: data.user.name,
           role: data.user.role,
         };
-        localStorage.setItem("userData", JSON.stringify(userData));
 
-        // 🔥 Dispatch custom event to update Navbar immediately
-        window.dispatchEvent(new Event("userDataUpdated"));
+        // Save to localStorage
+        localStorage.setItem("user", JSON.stringify(userData));
 
-        navigate("/");
+        // Dispatch to Redux store
+        dispatch(setUser(userData));
+
+        // Navigate based on user role
+        navigate(userData.role === "admin" ? "/admin" : "/dashboard");
       } else {
-        toast.error(data.message || "Login failed", { position: "top-right" });
+        toast.error(data.message || "Login failed");
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      toast.error("Something went wrong, please try again later.", { position: "top-right" });
+      toast.error("Something went wrong, please try again.");
     } finally {
       setLoading(false);
     }

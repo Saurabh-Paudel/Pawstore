@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -21,42 +22,25 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:8000/api/auth/signup", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+      await axios.post("http://localhost:8000/api/auth/signup", formData);
 
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success("Signup successful!", {
-          position: "top-right",
-          autoClose: 3000,
-        });
-        setTimeout(() => {
-          navigate("/login");
-        }, 3000);
-      } else {
-        // Check if there are validation errors
-        if (data.errors) {
-          setErrors(data.errors); // Set errors to state
-          data.errors.forEach((error) =>
-            toast.error(error.msg, { position: "top-right" })
-          );
-        } else {
-          toast.error(data.message || "Signup failed", {
-            position: "top-right",
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error during signup:", error);
-      toast.error("Something went wrong, please try again later.", {
+      toast.success("Signup successful!", {
         position: "top-right",
+        autoClose: 3000,
       });
+
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors); // Store validation errors
+        error.response.data.errors.forEach((err) =>
+          toast.error(err.msg, { position: "top-right" })
+        );
+      } else {
+        toast.error(error.response?.data?.message || "Signup failed", {
+          position: "top-right",
+        });
+      }
     }
   };
 
@@ -80,7 +64,6 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your name"
             />
-            {/* Show error if name is invalid */}
             {errors.some((error) => error.param === "name") && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.find((error) => error.param === "name").msg}
@@ -100,7 +83,6 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your email"
             />
-            {/* Show error if email is invalid */}
             {errors.some((error) => error.param === "email") && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.find((error) => error.param === "email").msg}
@@ -120,7 +102,6 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your password"
             />
-            {/* Show error if password is invalid */}
             {errors.some((error) => error.param === "password") && (
               <p className="text-red-500 text-sm mt-1">
                 {errors.find((error) => error.param === "password").msg}

@@ -10,45 +10,36 @@ import {
 } from "react-icons/bi";
 import { AiOutlineDashboard } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../../redux/slices/userSlice";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  const getUserData = () => JSON.parse(localStorage.getItem("userData"));
-
-  const updateUser = () => {
-    setUser(getUserData());
-  };
+  // ✅ Fetch user data from Redux store
+  const user = useSelector((state) => state.user.user);
 
   useEffect(() => {
-    updateUser();
-
-    const handleStorageChange = (event) => {
-      if (event.key === "userData") {
-        updateUser();
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
-  }, []);
+    // ✅ Retrieve user from localStorage when the component mounts
+    const storedUser = JSON.parse(localStorage.getItem("userData"));
+    if (storedUser) {
+      dispatch(setUser(storedUser));
+    }
+  }, [dispatch]);
 
   const handleLogout = () => {
     localStorage.removeItem("userData");
-    updateUser();
+    dispatch(setUser(null)); // ✅ Clear user from Redux state
     setIsDropdownOpen(false);
-    setIsMenuOpen(false); // Close menu on logout
+    setIsMenuOpen(false);
     navigate("/");
   };
 
-  // Close dropdown when clicking outside
+  //Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -56,9 +47,7 @@ export default function Navbar() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Close menu after clicking a link
@@ -66,10 +55,9 @@ export default function Navbar() {
     setIsMenuOpen(false);
     document.body.style.overflow = "auto";
   };
-
   return (
     <nav className="bg-[#FDEDD4] py-3 px-6 md:px-10 xl:px-[141px] flex items-center justify-between relative">
-      <Link to="/" onClick={closeMenu}>
+      <Link to="/" onClick={() => setIsMenuOpen(false)}>
         <div className="flex items-center gap-3">
           <img src={Icon} alt="Icon" className="h-10 w-10" />
           <p className="font-poppins font-bold text-lg">Pawstore</p>
@@ -94,7 +82,7 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Search Bar (Desktop) */}
+        {/* Search Bar */}
         <div className="relative hidden lg:flex items-center ml-4">
           <input
             type="search"
@@ -119,7 +107,6 @@ export default function Navbar() {
                 <Link
                   to="/dashboard"
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={closeMenu}
                 >
                   <AiOutlineDashboard className="h-5 w-5" /> Dashboard
                 </Link>
@@ -127,14 +114,13 @@ export default function Navbar() {
                   onClick={handleLogout}
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
                 >
-                  <BiLogOut className="h-5 w-5" />
-                  Logout
+                  <BiLogOut className="h-5 w-5" /> Logout
                 </button>
               </div>
             )}
           </div>
         ) : (
-          <Link to="/login" className="ml-4" onClick={closeMenu}>
+          <Link to="/login" className="ml-4">
             <div className="flex gap-2 text-gray-600 hover:text-black font-poppins">
               <BiUser className="h-6 w-6" />
               <span className="text-base">Login</span>
@@ -146,10 +132,7 @@ export default function Navbar() {
       {/* Mobile Menu Button */}
       <button
         className="md:flex lg:hidden z-50"
-        onClick={() => {
-          setIsMenuOpen(!isMenuOpen);
-          document.body.style.overflow = isMenuOpen ? "auto" : "hidden";
-        }}
+        onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
         {isMenuOpen ? (
           <BiX className="h-8 w-8" />
@@ -172,7 +155,7 @@ export default function Navbar() {
             { name: "Blogs", path: "/blogs" },
             { name: "Contact", path: "/contact" },
           ].map(({ name, path }) => (
-            <li key={name} className="hover:font-medium">
+            <li key={path} className="hover:font-medium">
               <Link to={path} onClick={closeMenu}>
                 {name}
               </Link>
@@ -196,7 +179,7 @@ export default function Navbar() {
             <Link
               to="/dashboard"
               className="text-lg text-gray-700 hover:text-black flex items-center gap-2"
-              onClick={closeMenu}
+              onClick={() => setIsMenuOpen(false)}
             >
               <AiOutlineDashboard className="h-5 w-5" /> Dashboard
             </Link>
@@ -211,7 +194,7 @@ export default function Navbar() {
           <Link
             to="/login"
             className="mt-6 text-lg text-gray-700 hover:text-black"
-            onClick={closeMenu}
+            onClick={() => setIsMenuOpen(false)}
           >
             Login
           </Link>
