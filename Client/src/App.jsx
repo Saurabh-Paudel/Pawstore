@@ -31,6 +31,10 @@ import DogBreed from "./Pages/AdminDashboard/DogBreeds/DogBreed";
 import InsertDogBreed from "./Pages/AdminDashboard/DogBreeds/InsertDogBreed";
 import UpdateDogBreed from "./Pages/AdminDashboard/DogBreeds/UpdateDogBreed";
 
+import DogProducts from "./Pages/AdminDashboard/PetProducts/PetProducts";
+import InsertDogProduct from "./Pages/AdminDashboard/PetProducts/InsertPetProduct";
+import UpdateDogProduct from "./Pages/AdminDashboard/PetProducts/UpdatePetProducts";
+
 const App = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
@@ -75,9 +79,12 @@ const App = () => {
 
       <Route path="/admin" element={<SellerLayout />}>
         <Route index element={<AdminDashboard />} />
-        <Route path="dog-breeds" element={<DogBreed />} /> {/* Fixed route */}
+        <Route path="dog-breeds" element={<DogBreed />} />
         <Route path="dog-breeds/insert" element={<InsertDogBreed />} />
         <Route path="dog-breeds/update" element={<UpdateDogBreed />} />
+        <Route path="pet-products" element={<DogProducts />} />
+        <Route path="pet-products/insert" element={<InsertDogProduct />} />
+        <Route path="pet-products/update" element={<UpdateDogProduct />} />
       </Route>
     </Routes>
   );
