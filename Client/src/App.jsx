@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "./redux/slices/userSlice";
 
@@ -27,6 +27,9 @@ import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 
 //AdminDashboard Pages
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
+import DogBreed from "./Pages/AdminDashboard/DogBreeds/DogBreed";
+import InsertDogBreed from "./Pages/AdminDashboard/DogBreeds/InsertDogBreed";
+import UpdateDogBreed from "./Pages/AdminDashboard/DogBreeds/UpdateDogBreed";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -70,13 +73,12 @@ const App = () => {
         </Route>
       )}
 
-      {userData.token && userData.role === "admin" && (
-        <Route path="/admin" element={<SellerLayout />}>
-          <Route path="" element={<AdminDashboard />} />
-        </Route>
-      )}
-
-      <Route path="*" element={<h2>404 Not Found</h2>} />
+      <Route path="/admin" element={<SellerLayout />}>
+        <Route index element={<AdminDashboard />} />
+        <Route path="dog-breeds" element={<DogBreed />} /> {/* Fixed route */}
+        <Route path="dog-breeds/insert" element={<InsertDogBreed />} />
+        <Route path="dog-breeds/update" element={<UpdateDogBreed />} />
+      </Route>
     </Routes>
   );
 };
