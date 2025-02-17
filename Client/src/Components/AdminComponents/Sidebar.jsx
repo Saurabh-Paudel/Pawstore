@@ -76,11 +76,11 @@ const Sidebar = () => {
           {/* Blog Menu */}
           <li>
             <Link
-              to="/admin/blog"
+              to="/admin/blogs"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
               <FaBlogger className="text-xl" />
-              <span>Blog</span>
+              <span>Blogs</span>
             </Link>
           </li>
 

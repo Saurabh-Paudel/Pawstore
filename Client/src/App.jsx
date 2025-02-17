@@ -27,6 +27,7 @@ import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 
 //AdminDashboard Pages
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
+
 import DogBreed from "./Pages/AdminDashboard/DogBreeds/DogBreed";
 import InsertDogBreed from "./Pages/AdminDashboard/DogBreeds/InsertDogBreed";
 import UpdateDogBreed from "./Pages/AdminDashboard/DogBreeds/UpdateDogBreed";
@@ -34,6 +35,10 @@ import UpdateDogBreed from "./Pages/AdminDashboard/DogBreeds/UpdateDogBreed";
 import DogProducts from "./Pages/AdminDashboard/PetProducts/PetProducts";
 import InsertDogProduct from "./Pages/AdminDashboard/PetProducts/InsertPetProduct";
 import UpdateDogProduct from "./Pages/AdminDashboard/PetProducts/UpdatePetProducts";
+
+import BlogsManagement from "./Pages/AdminDashboard/Blog/Blog";
+import InsertBlog from "./Pages/AdminDashboard/Blog/InsertBlog";
+import UpdateBlog from "./Pages/AdminDashboard/Blog/UpdateBlog";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -77,15 +82,20 @@ const App = () => {
         </Route>
       )}
 
-      <Route path="/admin" element={<SellerLayout />}>
-        <Route index element={<AdminDashboard />} />
-        <Route path="dog-breeds" element={<DogBreed />} />
-        <Route path="dog-breeds/insert" element={<InsertDogBreed />} />
-        <Route path="dog-breeds/update" element={<UpdateDogBreed />} />
-        <Route path="pet-products" element={<DogProducts />} />
-        <Route path="pet-products/insert" element={<InsertDogProduct />} />
-        <Route path="pet-products/update" element={<UpdateDogProduct />} />
-      </Route>
+      {userData.token && userData.role === "admin" && (
+        <Route path="/admin" element={<SellerLayout />}>
+          <Route index element={<AdminDashboard />} />
+          <Route path="dog-breeds" element={<DogBreed />} />
+          <Route path="dog-breeds/insert" element={<InsertDogBreed />} />
+          <Route path="dog-breeds/update" element={<UpdateDogBreed />} />
+          <Route path="pet-products" element={<DogProducts />} />
+          <Route path="pet-products/insert" element={<InsertDogProduct />} />
+          <Route path="pet-products/update" element={<UpdateDogProduct />} />
+          <Route path="blogs" element={<BlogsManagement />} />
+          <Route path="blogs/insert" element={<InsertBlog />} />
+          <Route path="blogs/update" element={<UpdateBlog />} />
+        </Route>
+      )}
     </Routes>
   );
 };
