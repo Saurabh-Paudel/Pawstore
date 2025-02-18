@@ -121,7 +121,7 @@ const Sidebar = () => {
               </li>
               <li>
                 <Link
-                  to="/admin/sales/dog-accessories"
+                  to="/admin/sales/accessories"
                   className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
                 >
                   <FaBox className="text-xl" />

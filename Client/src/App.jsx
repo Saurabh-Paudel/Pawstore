@@ -43,8 +43,7 @@ import UpdateBlog from "./Pages/AdminDashboard/Blog/UpdateBlog";
 import Newsletter from "./Pages/AdminDashboard/Newsletters/Newsletters";
 
 import DogsSales from "./Pages/AdminDashboard/Sales/Dogs/DogsSales";
-import InsertDog from "./Pages/AdminDashboard/Sales/Dogs/InsertDog";
-import UpdateDog from "./Pages/AdminDashboard/Sales/Dogs/UpdateDog";
+import AccessoriesSales from "./Pages/AdminDashboard/Sales/Accessories/AccessoriesSales";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -102,8 +101,7 @@ const App = () => {
           <Route path="blogs/update" element={<UpdateBlog />} />
           <Route path="newsletters" element={<Newsletter />} />
           <Route path="sales/dogs" element={<DogsSales />} />
-          <Route path="sales/dogs/insert" element={<InsertDog />} />
-          <Route path="sales/dogs/update" element={<UpdateDog />} />
+          <Route path="sales/accessories" element={<AccessoriesSales />} />
         </Route>
       )}
     </Routes>

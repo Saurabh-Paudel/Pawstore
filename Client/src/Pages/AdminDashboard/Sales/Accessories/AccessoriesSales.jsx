@@ -2,61 +2,63 @@ import React, { useState } from "react";
 import { FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
-const DogsSales = () => {
-  const [dogs, setDogs] = useState([
+const DogAccessories = () => {
+  const [products, setProducts] = useState([
     {
       id: 1,
-      name: "Golden Retriever",
-      breed: "Golden Retriever",
-      price: "$1200",
-      age: "2 Years",
-      vaccinated: "Yes",
+      name: "Dog Leash",
+      price: "$20",
       status: "Available",
+      description: "A strong and durable dog leash.",
+      color: "Black",
+      size: "Medium",
       image: "https://via.placeholder.com/150",
     },
     {
       id: 2,
-      name: "Bulldog",
-      breed: "English Bulldog",
-      price: "$1500",
-      age: "1.5 Years",
-      vaccinated: "Yes",
+      name: "Dog Bed",
+      price: "$50",
       status: "Sold",
+      description: "Comfortable bed for your dog.",
+      color: "Gray",
+      size: "Large",
       image: "https://via.placeholder.com/150",
     },
     {
       id: 3,
-      name: "Beagle",
-      breed: "Beagle",
-      price: "$800",
-      age: "1 Year",
-      vaccinated: "No",
+      name: "Dog Collar",
+      price: "$15",
       status: "Available",
+      description: "Stylish collar for dogs.",
+      color: "Red",
+      size: "Small",
       image: "https://via.placeholder.com/150",
     },
   ]);
 
   const [statusChanged, setStatusChanged] = useState(
-    dogs.reduce((acc, dog) => {
-      acc[dog.id] = false; // Initially, status hasn't been changed for any dog
+    products.reduce((acc, product) => {
+      acc[product.id] = false; // Initially, status hasn't been changed for any product
       return acc;
     }, {})
   );
 
   const handleStatusChange = (id, newStatus) => {
-    setDogs(
-      dogs.map((dog) => (dog.id === id ? { ...dog, status: newStatus } : dog))
+    setProducts(
+      products.map((product) =>
+        product.id === id ? { ...product, status: newStatus } : product
+      )
     );
     setStatusChanged({
       ...statusChanged,
-      [id]: newStatus !== dogs.find((dog) => dog.id === id).status, // Track if status has changed
+      [id]: newStatus !== products.find((product) => product.id === id).status, // Track if status has changed
     });
   };
 
   return (
     <div className="space-y-6">
       <h2 className="text-3xl font-semibold text-gray-800">
-        Manage Dogs Sales
+        Manage Dog Accessories
       </h2>
 
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-6">
@@ -65,35 +67,36 @@ const DogsSales = () => {
             <tr>
               <th className="py-3 px-6 text-left text-gray-700">S.No</th>
               <th className="py-3 px-6 text-left text-gray-700">Image</th>
-              <th className="py-3 px-6 text-left text-gray-700">Dog Name</th>
-              <th className="py-3 px-6 text-left text-gray-700">Breed</th>
+              <th className="py-3 px-6 text-left text-gray-700">
+                Product Name
+              </th>
               <th className="py-3 px-6 text-left text-gray-700">Price</th>
-              <th className="py-3 px-6 text-left text-gray-700">Age</th>
-              <th className="py-3 px-6 text-left text-gray-700">Vaccinated</th>
               <th className="py-3 px-6 text-left text-gray-700">Status</th>
+              <th className="py-3 px-6 text-left text-gray-700">Description</th>
+              <th className="py-3 px-6 text-left text-gray-700">Color</th>
+              <th className="py-3 px-6 text-left text-gray-700">Size</th>
               <th className="py-3 px-6 text-left text-gray-700">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {dogs.map((dog, index) => (
-              <tr key={dog.id} className="border-b hover:bg-gray-50">
+            {products.map((product, index) => (
+              <tr key={product.id} className="border-b hover:bg-gray-50">
                 <td className="py-3 px-6 text-gray-800">{index + 1}</td>
-                <td className="py-3 px-6">
+                <td className="py-3 px-6 text-gray-500">
                   <img
-                    src={dog.image}
-                    alt={dog.name}
+                    src={product.image}
+                    alt={product.name}
                     className="w-16 h-16 object-cover rounded-lg"
                   />
                 </td>
-                <td className="py-3 px-6 text-gray-800">{dog.name}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.breed}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.price}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.age}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.vaccinated}</td>
+                <td className="py-3 px-6 text-gray-800">{product.name}</td>
+                <td className="py-3 px-6 text-gray-500">{product.price}</td>
                 <td className="py-3 px-6 text-gray-500">
                   <select
-                    value={dog.status}
-                    onChange={(e) => handleStatusChange(dog.id, e.target.value)}
+                    value={product.status}
+                    onChange={(e) =>
+                      handleStatusChange(product.id, e.target.value)
+                    }
                     className="bg-gray-200 p-2 rounded-md"
                   >
                     <option value="Shipped">Shipped</option>
@@ -101,15 +104,20 @@ const DogsSales = () => {
                     <option value="Delivered">Delivered</option>
                   </select>
                 </td>
+                <td className="py-3 px-6 text-gray-500">
+                  {product.description}
+                </td>
+                <td className="py-3 px-6 text-gray-500">{product.color}</td>
+                <td className="py-3 px-6 text-gray-500">{product.size}</td>
                 <td className="py-3 px-6 space-x-3">
-                  <Link to={`/admin/sales/dogs/update/${dog.id}`}>
+                  <Link to={`/admin/pet-products/update/${product.id}`}>
                     <button
                       className={`text-white bg-yellow-500 py-2 px-4 rounded-md text-base ${
-                        !statusChanged[dog.id]
+                        !statusChanged[product.id]
                           ? "cursor-not-allowed opacity-50"
                           : ""
                       }`}
-                      disabled={!statusChanged[dog.id]} // Disable the button if status is not changed
+                      disabled={!statusChanged[product.id]} // Disable the button if status is not changed
                     >
                       Update
                     </button>
@@ -124,4 +132,4 @@ const DogsSales = () => {
   );
 };
 
-export default DogsSales;
+export default DogAccessories;
