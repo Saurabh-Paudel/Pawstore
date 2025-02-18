@@ -42,6 +42,10 @@ import UpdateBlog from "./Pages/AdminDashboard/Blog/UpdateBlog";
 
 import Newsletter from "./Pages/AdminDashboard/Newsletters/Newsletters";
 
+import DogsSales from "./Pages/AdminDashboard/Sales/Dogs/DogsSales";
+import InsertDog from "./Pages/AdminDashboard/Sales/Dogs/InsertDog";
+import UpdateDog from "./Pages/AdminDashboard/Sales/Dogs/UpdateDog";
+
 const App = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.user);
@@ -97,6 +101,9 @@ const App = () => {
           <Route path="blogs/insert" element={<InsertBlog />} />
           <Route path="blogs/update" element={<UpdateBlog />} />
           <Route path="newsletters" element={<Newsletter />} />
+          <Route path="sales/dogs" element={<DogsSales />} />
+          <Route path="sales/dogs/insert" element={<InsertDog />} />
+          <Route path="sales/dogs/update" element={<UpdateDog />} />
         </Route>
       )}
     </Routes>
