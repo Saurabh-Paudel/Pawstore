@@ -11,6 +11,7 @@ import {
   FaEnvelopeOpenText,
   FaBlogger,
   FaCartPlus,
+  FaDog,
 } from "react-icons/fa";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { logout } from "../../redux/slices/userSlice";
@@ -48,6 +49,17 @@ const Sidebar = () => {
             >
               <FaTachometerAlt className="text-xl" />
               <span>Dashboard</span>
+            </Link>
+          </li>
+
+          {/* Dogs sell */}
+          <li>
+            <Link
+              to="/admin/dog"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaDog className="text-xl" />
+              <span>Dog</span>
             </Link>
           </li>
 

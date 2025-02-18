@@ -32,6 +32,10 @@ import DogBreed from "./Pages/AdminDashboard/DogBreeds/DogBreed";
 import InsertDogBreed from "./Pages/AdminDashboard/DogBreeds/InsertDogBreed";
 import UpdateDogBreed from "./Pages/AdminDashboard/DogBreeds/UpdateDogBreed";
 
+import Dogs from "./Pages/AdminDashboard/Dogs/Dogs";
+import DogInsert from "./Pages/AdminDashboard/Dogs/DogInsert";
+import DogUpdate from "./Pages/AdminDashboard/Dogs/DogUpdate";
+
 import DogProducts from "./Pages/AdminDashboard/PetProducts/PetProducts";
 import InsertDogProduct from "./Pages/AdminDashboard/PetProducts/InsertPetProduct";
 import UpdateDogProduct from "./Pages/AdminDashboard/PetProducts/UpdatePetProducts";
@@ -93,6 +97,9 @@ const App = () => {
           <Route path="dog-breeds" element={<DogBreed />} />
           <Route path="dog-breeds/insert" element={<InsertDogBreed />} />
           <Route path="dog-breeds/update" element={<UpdateDogBreed />} />
+          <Route path="dog" element={<Dogs />} />
+          <Route path="dog/insert" element={<DogInsert />} />
+          <Route path="dog/update" element={<DogUpdate />} />
           <Route path="pet-products" element={<DogProducts />} />
           <Route path="pet-products/insert" element={<InsertDogProduct />} />
           <Route path="pet-products/update" element={<UpdateDogProduct />} />
