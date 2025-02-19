@@ -157,7 +157,7 @@ const Sidebar = () => {
           {/* Settings Menu */}
           <li>
             <Link
-              to="/admin/settings"
+              to="/admin/genral-settings"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
               <FaCogs className="text-xl" />

@@ -48,6 +48,8 @@ import Newsletter from "./Pages/AdminDashboard/Newsletters/Newsletters";
 
 import DogsSales from "./Pages/AdminDashboard/Sales/Dogs/DogsSales";
 import AccessoriesSales from "./Pages/AdminDashboard/Sales/Accessories/AccessoriesSales";
+import User from "./Pages/AdminDashboard/User/User";
+import GeneralSetting from "./Pages/AdminDashboard/GeneralSettings/GeneralSettings";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -109,6 +111,8 @@ const App = () => {
           <Route path="newsletters" element={<Newsletter />} />
           <Route path="sales/dogs" element={<DogsSales />} />
           <Route path="sales/accessories" element={<AccessoriesSales />} />
+          <Route path="users" element={<User />} />
+          <Route path="genral-settings" element={<GeneralSetting />} />
         </Route>
       )}
     </Routes>
