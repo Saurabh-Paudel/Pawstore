@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import {
   FaTachometerAlt,
-  FaUsers,
-  FaChartLine,
+  FaUser,
+  FaShoppingCart,
+  FaHeart,
+  FaEnvelope,
+  FaNewspaper,
   FaCog,
+  FaQuestionCircle,
   FaSignOutAlt,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { logout } from "../../redux/slices/userSlice"; // Adjust the path as needed
+import { logout } from "../../redux/slices/userSlice";
 
 const Sidebar = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -17,8 +21,8 @@ const Sidebar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem("user");
-    dispatch(logout()); // Dispatch logout action
-    navigate("/login"); // Redirect to login page
+    dispatch(logout());
+    navigate("/login");
   };
 
   return (
@@ -28,11 +32,11 @@ const Sidebar = () => {
       } transition-all duration-300`}
     >
       <div className="p-4">
-        <h2 className="text-xl font-bold mb-6">Dashboard</h2>
+        <h2 className="text-xl font-bold mb-6">User Dashboard</h2>
         <ul className="space-y-4">
           <li>
             <Link
-              to="/"
+              to="/dashboard"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
               <FaTachometerAlt className="text-xl" />
@@ -41,20 +45,47 @@ const Sidebar = () => {
           </li>
           <li>
             <Link
-              to="/users"
+              to="user-profile"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
-              <FaUsers className="text-xl" />
-              && <span>Users</span>
+              <FaUser className="text-xl" />
+              <span>My Profile</span>
             </Link>
           </li>
           <li>
             <Link
-              to="/analytics"
+              to="/orders"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
-              <FaChartLine className="text-xl" />
-              <span>Analytics</span>
+              <FaShoppingCart className="text-xl" />
+              <span>My Orders</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/favorites"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaHeart className="text-xl" />
+              <span>Favorites</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/messages"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaEnvelope className="text-xl" />
+              <span>Messages</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/newsletters"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaNewspaper className="text-xl" />
+              <span>Newsletters</span>
             </Link>
           </li>
           <li>
@@ -64,6 +95,15 @@ const Sidebar = () => {
             >
               <FaCog className="text-xl" />
               <span>Settings</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/help"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaQuestionCircle className="text-xl" />
+              <span>Help & Support</span>
             </Link>
           </li>
           <li>

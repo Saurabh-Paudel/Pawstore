@@ -25,6 +25,8 @@ import SignUp from "./Pages/Authentication/SignUp";
 // UserDashboard Pages
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 
+import UserProfile from "./Pages/UserDashboard/UserProfile/UserProfile";
+
 //AdminDashboard Pages
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
 
@@ -90,7 +92,8 @@ const App = () => {
 
       {userData.token && userData.role === "buyer" && (
         <Route path="/dashboard" element={<BuyerLayout />}>
-          <Route path="" element={<UserDashboard />} />
+          <Route index element={<UserDashboard />} />
+          <Route path="user-profile" element={<UserProfile />} />
         </Route>
       )}
 
@@ -110,7 +113,7 @@ const App = () => {
           <Route path="blogs/insert" element={<InsertBlog />} />
           <Route path="blogs/update" element={<UpdateBlog />} />
           <Route path="newsletters" element={<Newsletter />} />
-          <Route path="messages" element={<MessageDashboard/>} />
+          <Route path="messages" element={<MessageDashboard />} />
           <Route path="sales/dogs" element={<DogsSales />} />
           <Route path="sales/accessories" element={<AccessoriesSales />} />
           <Route path="users" element={<User />} />
