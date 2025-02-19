@@ -54,7 +54,7 @@ const Sidebar = () => {
           </li>
           <li>
             <Link
-              to="/orders"
+              to="my-orders"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
               <FaShoppingCart className="text-xl" />
