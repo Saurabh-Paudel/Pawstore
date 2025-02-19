@@ -50,6 +50,7 @@ import DogsSales from "./Pages/AdminDashboard/Sales/Dogs/DogsSales";
 import AccessoriesSales from "./Pages/AdminDashboard/Sales/Accessories/AccessoriesSales";
 import User from "./Pages/AdminDashboard/User/User";
 import GeneralSetting from "./Pages/AdminDashboard/GeneralSettings/GeneralSettings";
+import MessageDashboard from "./Pages/AdminDashboard/Messages/Messages";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -109,6 +110,7 @@ const App = () => {
           <Route path="blogs/insert" element={<InsertBlog />} />
           <Route path="blogs/update" element={<UpdateBlog />} />
           <Route path="newsletters" element={<Newsletter />} />
+          <Route path="messages" element={<MessageDashboard/>} />
           <Route path="sales/dogs" element={<DogsSales />} />
           <Route path="sales/accessories" element={<AccessoriesSales />} />
           <Route path="users" element={<User />} />

@@ -13,6 +13,7 @@ import {
   FaCartPlus,
   FaDog,
 } from "react-icons/fa";
+import { FaMessage } from "react-icons/fa6";
 import { MdKeyboardArrowDown, MdKeyboardArrowUp } from "react-icons/md";
 import { logout } from "../../redux/slices/userSlice";
 
@@ -37,7 +38,7 @@ const Sidebar = () => {
   };
 
   return (
-    <div className="bg-gray-800 text-white h-screen w-64">
+    <div className="bg-gray-800 text-white h-auto w-64">
       <div className="p-4">
         <h2 className="text-xl font-bold mb-6">Dashboard</h2>
         <ul className="space-y-4">
@@ -51,7 +52,6 @@ const Sidebar = () => {
               <span>Dashboard</span>
             </Link>
           </li>
-
           {/* Dogs sell */}
           <li>
             <Link
@@ -62,7 +62,6 @@ const Sidebar = () => {
               <span>Dog</span>
             </Link>
           </li>
-
           {/* Dog Breeds Menu */}
           <li>
             <Link
@@ -73,7 +72,6 @@ const Sidebar = () => {
               <span>Dog Breeds</span>
             </Link>
           </li>
-
           {/* Products Menu */}
           <li>
             <Link
@@ -84,7 +82,6 @@ const Sidebar = () => {
               <span>Products</span>
             </Link>
           </li>
-
           {/* Blog Menu */}
           <li>
             <Link
@@ -95,7 +92,6 @@ const Sidebar = () => {
               <span>Blogs</span>
             </Link>
           </li>
-
           {/* Newsletters Menu */}
           <li>
             <Link
@@ -107,6 +103,16 @@ const Sidebar = () => {
             </Link>
           </li>
 
+          {/* Messages Menu */}
+          <li>
+            <Link
+              to="/admin/messages"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaMessage className="text-xl" />
+              <span>Messages</span>
+            </Link>
+          </li>
           {/* Sales (Collapsible Menu) */}
           <li
             onClick={toggleSalesMenu}
@@ -118,7 +124,6 @@ const Sidebar = () => {
             </div>
             {isSalesOpen ? <MdKeyboardArrowUp /> : <MdKeyboardArrowDown />}
           </li>
-
           {/* Sales Submenu */}
           {isSalesOpen && (
             <ul className="ml-6 space-y-2">
@@ -142,7 +147,6 @@ const Sidebar = () => {
               </li>
             </ul>
           )}
-
           {/* Users Menu */}
           <li>
             <Link
@@ -153,7 +157,6 @@ const Sidebar = () => {
               <span>Users</span>
             </Link>
           </li>
-
           {/* Settings Menu */}
           <li>
             <Link
@@ -164,7 +167,6 @@ const Sidebar = () => {
               <span>Settings</span>
             </Link>
           </li>
-
           {/* Logout Menu */}
           <li>
             <button
