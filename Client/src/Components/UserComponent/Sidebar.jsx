@@ -3,11 +3,8 @@ import {
   FaTachometerAlt,
   FaUser,
   FaShoppingCart,
-  FaHeart,
-  FaEnvelope,
   FaNewspaper,
   FaCog,
-  FaQuestionCircle,
   FaSignOutAlt,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
@@ -63,24 +60,6 @@ const Sidebar = () => {
           </li>
           <li>
             <Link
-              to="/favorites"
-              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
-            >
-              <FaHeart className="text-xl" />
-              <span>Favorites</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/messages"
-              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
-            >
-              <FaEnvelope className="text-xl" />
-              <span>Messages</span>
-            </Link>
-          </li>
-          <li>
-            <Link
               to="/newsletters"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
@@ -95,15 +74,6 @@ const Sidebar = () => {
             >
               <FaCog className="text-xl" />
               <span>Settings</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              to="/help"
-              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
-            >
-              <FaQuestionCircle className="text-xl" />
-              <span>Help & Support</span>
             </Link>
           </li>
           <li>
