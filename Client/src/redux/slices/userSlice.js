@@ -7,6 +7,12 @@ const initialState = {
   role: localStorage.getItem("user")
     ? JSON.parse(localStorage.getItem("user")).role
     : null,
+  username: localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")).username
+    : "",
+  email: localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user")).email
+    : "",
 };
 
 const userSlice = createSlice({
@@ -16,11 +22,15 @@ const userSlice = createSlice({
     setUser: (state, action) => {
       state.token = action.payload.token;
       state.role = action.payload.role;
+      state.username = action.payload.name;
+      state.email = action.payload.email;
       localStorage.setItem("user", JSON.stringify(action.payload));
     },
     logout: (state) => {
       state.token = null;
       state.role = null;
+      state.username = "";
+      state.email = "";
       localStorage.removeItem("user");
     },
   },
