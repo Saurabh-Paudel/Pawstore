@@ -69,7 +69,7 @@ const Sidebar = () => {
           </li>
           <li>
             <Link
-              to="/settings"
+              to="settings"
               className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
             >
               <FaCog className="text-xl" />

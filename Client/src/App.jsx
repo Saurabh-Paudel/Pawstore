@@ -55,6 +55,7 @@ import AccessoriesSales from "./Pages/AdminDashboard/Sales/Accessories/Accessori
 import User from "./Pages/AdminDashboard/User/User";
 import GeneralSetting from "./Pages/AdminDashboard/GeneralSettings/GeneralSettings";
 import MessageDashboard from "./Pages/AdminDashboard/Messages/Messages";
+import UserSettings from "./Pages/UserDashboard/Seetings/UserSettings";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -98,6 +99,7 @@ const App = () => {
           <Route path="user-profile" element={<UserProfile />} />
           <Route path="my-orders" element={<MyOrders />} />
           <Route path="user-newsletter" element={<UserNewsletter />} />
+          <Route path="settings" element={<UserSettings />} />
         </Route>
       )}
 
