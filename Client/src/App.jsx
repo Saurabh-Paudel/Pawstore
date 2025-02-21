@@ -27,6 +27,7 @@ import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 
 import UserProfile from "./Pages/UserDashboard/UserProfile/UserProfile";
 import MyOrders from "./Pages/UserDashboard/MyOrder/MyOrders";
+import UserNewsletter from "./Pages/UserDashboard/Newsletter/UserNewsletter";
 
 //AdminDashboard Pages
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
@@ -96,6 +97,7 @@ const App = () => {
           <Route index element={<UserDashboard />} />
           <Route path="user-profile" element={<UserProfile />} />
           <Route path="my-orders" element={<MyOrders />} />
+          <Route path="user-newsletter" element={<UserNewsletter />} />
         </Route>
       )}
 
