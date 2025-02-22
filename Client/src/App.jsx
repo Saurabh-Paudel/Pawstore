@@ -6,7 +6,7 @@ import { setUser } from "./redux/slices/userSlice";
 // Layouts
 import RootLayout from "./Components/RootComponents/RootLayout";
 import SellerLayout from "./Components/AdminComponents/SellerLayout";
-import BuyerLayout from "./Components/UserComponent/BuyerLyout";
+import BuyerLayout from "./Components/UserComponent/BuyerLayout";
 
 // Client Pages
 import Home from "./Pages/Client/Home";
@@ -24,7 +24,6 @@ import SignUp from "./Pages/Authentication/SignUp";
 
 // UserDashboard Pages
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
-
 import UserProfile from "./Pages/UserDashboard/UserProfile/UserProfile";
 import MyOrders from "./Pages/UserDashboard/MyOrder/MyOrders";
 import UserNewsletter from "./Pages/UserDashboard/Newsletter/UserNewsletter";

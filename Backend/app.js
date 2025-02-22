@@ -1,7 +1,8 @@
 const express = require("express");
 const dbConnection = require("./config/db");
 const cors = require("cors");
-const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/userRoutes");
+const userInfo = require("./routes/userInfoRoutes");
 
 const app = express();
 
@@ -13,7 +14,8 @@ app.use(cors());
 dbConnection();
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", userRoutes);
+app.use("/api/user", userInfo);
 
 app.get("/", function (req, res) {
   res.send("Hello World");

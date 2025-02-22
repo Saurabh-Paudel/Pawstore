@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
-export default function SellerLayout({ setUser }) {
+export default function BuyerLayout({ setUser }) {
   return (
     <div className="flex">
       <Sidebar setUser={setUser} />
