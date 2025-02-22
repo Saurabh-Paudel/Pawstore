@@ -11,7 +11,7 @@ import {
 import { AiOutlineDashboard } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { setUser } from "../../redux/slices/userSlice";
+import { logout } from "../../redux/slices/userSlice";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,26 +20,18 @@ export default function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // ✅ Fetch user data from Redux store
-  const user = useSelector((state) => state.user.user);
-
-  useEffect(() => {
-    // ✅ Retrieve user from localStorage when the component mounts
-    const storedUser = JSON.parse(localStorage.getItem("userData"));
-    if (storedUser) {
-      dispatch(setUser(storedUser));
-    }
-  }, [dispatch]);
+  // Fetch user data from Redux store
+  const user = useSelector((state) => state.user);
+  console.log("Redux user:", user); // Debug log
 
   const handleLogout = () => {
-    localStorage.removeItem("userData");
-    dispatch(setUser(null)); // ✅ Clear user from Redux state
+    dispatch(logout());
     setIsDropdownOpen(false);
     setIsMenuOpen(false);
     navigate("/");
   };
 
-  //Close dropdown when clicking outside
+  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -55,6 +47,7 @@ export default function Navbar() {
     setIsMenuOpen(false);
     document.body.style.overflow = "auto";
   };
+
   return (
     <nav className="bg-[#FDEDD4] py-3 px-6 md:px-10 xl:px-[141px] flex items-center justify-between relative">
       <Link to="/" onClick={() => setIsMenuOpen(false)}>
@@ -93,20 +86,23 @@ export default function Navbar() {
         </div>
 
         {/* User Menu */}
-        {user ? (
+        {user.token ? (
           <div ref={dropdownRef} className="relative">
             <span
               className="text-black text-lg cursor-pointer flex items-center"
-              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onClick={() => {
+                console.log("Toggle dropdown");
+                setIsDropdownOpen(!isDropdownOpen);
+              }}
             >
-              {user.name} <BiChevronDown className="ml-1 text-xl" />
+              {user.username} <BiChevronDown className="ml-1 text-xl" />
             </span>
-
             {isDropdownOpen && (
               <div className="absolute top-12 right-0 bg-white shadow-lg rounded-md py-2 w-48 z-50">
                 <Link
                   to="/dashboard"
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100"
+                  onClick={() => setIsDropdownOpen(false)}
                 >
                   <AiOutlineDashboard className="h-5 w-5" /> Dashboard
                 </Link>
@@ -174,7 +170,7 @@ export default function Navbar() {
         </div>
 
         {/* User Menu (Mobile) */}
-        {user ? (
+        {user.token ? (
           <div className="mt-6 flex flex-col items-center gap-3">
             <Link
               to="/dashboard"
