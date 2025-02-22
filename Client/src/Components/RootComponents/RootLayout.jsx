@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../RootComponents/Navbar";
 import Footer from "../RootComponents/Footer";
 import { Outlet } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
 
 export default function RootLayout() {
   return (
@@ -9,6 +10,7 @@ export default function RootLayout() {
       <Header />
       <Outlet />
       <Footer />
+      <ToastContainer />
     </>
   );
 }
