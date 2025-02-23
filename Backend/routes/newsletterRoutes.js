@@ -8,6 +8,6 @@ const {
 
 router.post("/subscribe", subscribe); // Subscribe
 router.get("/subscribers", getSubscribers); // Get all subscribers
-router.delete("/subscribe/:id", deleteSubscriber); // Delete a subscriber
+router.delete("/subscribe/:email", deleteSubscriber); // Delete a subscriber
 
 module.exports = router;

@@ -36,10 +36,12 @@ exports.getSubscribers = async (req, res) => {
 // Delete a Subscriber
 exports.deleteSubscriber = async (req, res) => {
   try {
-    const { id } = req.params;
-    const deleted = await Newsletter.findByIdAndDelete(id);
-    if (!deleted)
+    const { email } = req.params;
+
+    const deleted = await Newsletter.findOneAndDelete({ email }); 
+    if (!deleted) {
       return res.status(404).json({ error: "Subscriber not found" });
+    }
 
     res
       .status(200)

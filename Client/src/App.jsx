@@ -27,6 +27,7 @@ import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 import UserProfile from "./Pages/UserDashboard/UserProfile/UserProfile";
 import MyOrders from "./Pages/UserDashboard/MyOrder/MyOrders";
 import UserNewsletter from "./Pages/UserDashboard/Newsletter/UserNewsletter";
+import UserSettings from "./Pages/UserDashboard/Settings/UserSettings";
 
 //AdminDashboard Pages
 import AdminDashboard from "./Pages/AdminDashboard/AdminDashboard";
@@ -54,7 +55,6 @@ import AccessoriesSales from "./Pages/AdminDashboard/Sales/Accessories/Accessori
 import User from "./Pages/AdminDashboard/User/User";
 import GeneralSetting from "./Pages/AdminDashboard/GeneralSettings/GeneralSettings";
 import MessageDashboard from "./Pages/AdminDashboard/Messages/Messages";
-import UserSettings from "./Pages/UserDashboard/Seetings/UserSettings";
 
 const App = () => {
   const dispatch = useDispatch();

@@ -1,13 +1,77 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux"; // Import Redux state
+import axios from "axios";
 
 export default function UserNewsletter() {
-  const [isSubscribed, setIsSubscribed] = useState(true); // Example: User is subscribed
-  const userEmail = "user@example.com"; // Example email
-  const subscriptionDate = "2024-01-15"; // Example date
+  const userEmail = useSelector((state) => state.user.email); // Get email from Redux
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [subscriptionDate, setSubscriptionDate] = useState("");
 
-  const toggleSubscription = () => {
-    setIsSubscribed(!isSubscribed);
-    // Here, you can add an API call to update the subscription status in the backend
+  // Fetch subscription status when email is available
+  useEffect(() => {
+    const fetchSubscriber = async () => {
+      if (!userEmail) return; // Skip if no email is available
+
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/newsletter/subscribers?email=${userEmail}`
+        );
+        if (response.data && response.data.length > 0) {
+          setIsSubscribed(true);
+          const subscriber = response.data[0];
+          if (subscriber.date) {
+            setSubscriptionDate(subscriber.date.split("T")[0]);
+          } else {
+            console.error("Date is undefined in subscriber data:", subscriber);
+          }
+        } else {
+          setIsSubscribed(false);
+        }
+      } catch (error) {
+        console.error("Error fetching subscriber:", error);
+      }
+    };
+
+    fetchSubscriber();
+  }, [userEmail]); // Run when userEmail changes
+
+  // Handle subscription toggle
+  const toggleSubscription = async () => {
+    if (!userEmail) {
+      alert("No email found! Please log in.");
+      return;
+    }
+
+    if (isSubscribed) {
+      try {
+        await axios.delete(
+          `http://localhost:8000/api/newsletter/subscribe/${userEmail}`
+        );
+        setIsSubscribed(false);
+        setSubscriptionDate("");
+        alert("Successfully unsubscribed");
+      } catch (error) {
+        console.error("Error unsubscribing:", error);
+        alert("Failed to unsubscribe");
+      }
+    } else {
+      try {
+        const response = await axios.post(
+          "http://localhost:8000/api/newsletter/subscribe",
+          { email: userEmail }
+        );
+        if (response.data.subscriber) {
+          setIsSubscribed(true);
+          setSubscriptionDate(
+            new Date(response.data.subscriber.date).toLocaleDateString()
+          );
+          alert("Successfully subscribed");
+        }
+      } catch (error) {
+        console.error("Error subscribing:", error);
+        alert("Failed to subscribe");
+      }
+    }
   };
 
   return (
@@ -16,6 +80,7 @@ export default function UserNewsletter() {
         <h2 className="text-2xl font-semibold text-gray-800">
           Newsletter Subscription
         </h2>
+
         <div
           className={`mt-4 p-3 rounded-md text-lg font-medium ${
             isSubscribed
@@ -25,6 +90,7 @@ export default function UserNewsletter() {
         >
           {isSubscribed ? "You are subscribed! ✅" : "Not subscribed ❌"}
         </div>
+
         {isSubscribed && (
           <div className="mt-4 text-gray-700 text-sm">
             <p>
@@ -36,6 +102,7 @@ export default function UserNewsletter() {
             </p>
           </div>
         )}
+
         <button
           onClick={toggleSubscription}
           className={`mt-6 w-full px-4 py-2 rounded-lg text-white font-medium ${
