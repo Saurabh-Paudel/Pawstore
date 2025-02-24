@@ -5,78 +5,81 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const UserProfile = () => {
-  const { email, username } = useSelector((state) => state.user); // Get username and email from Redux state
+  const { email, username } = useSelector((state) => state.user);
 
-  // Initialize user state
-  const [user, setUserState] = useState({
-    username: "",
-    email: "",
+  const [userData, setUserData] = useState(null);
+  const [formData, setFormData] = useState({
+    username: username || "",
+    email: email || "",
     phone: "",
     address: "",
     gender: "",
     dob: "",
   });
 
-  const [editMode, setEditMode] = useState(false);
-  const [formData, setFormData] = useState({ ...user });
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
+  const [insertMode, setInsertMode] = useState(true);
 
   // Format date to YYYY-MM-DD
   const formatDate = (date) => {
     if (!date) return "";
-    const formattedDate = new Date(date).toISOString().split("T")[0]; // Split to get YYYY-MM-DD
-    return formattedDate;
+    return new Date(date).toISOString().split("T")[0];
   };
 
+  // Fetch user data
   useEffect(() => {
-    if (!email) {
-      toast.error("No email found in Redux state.");
-      return;
-    }
+    if (!email) return;
 
     const fetchUser = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/user/${email}` // Fetch user by email from Redux state
+          `http://localhost:8000/api/user/${email}`
         );
-        const formattedUser = {
-          ...response.data,
-          dob: formatDate(response.data.dob), // Ensure dob is stored in YYYY-MM-DD format
-        };
-        setUserState(formattedUser);
-        setLoading(false);
+        if (response.data) {
+          setUserData(response.data);
+          setInsertMode(false); // User exists
+          setFormData({ ...response.data, dob: formatDate(response.data.dob) });
+        }
       } catch (error) {
-        toast.error("Error fetching user data.");
         console.error("Error fetching user:", error);
+      } finally {
         setLoading(false);
       }
     };
 
     fetchUser();
-  }, [email]); // Dependency on email from Redux state
+  }, [email]);
 
-  useEffect(() => {
-    setFormData({ ...user }); // Sync form data with the user state
-  }, [user]);
-
+  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Insert new user
+  const handleInsert = async () => {
+    try {
+      const response = await axios.post(
+        `http://localhost:8000/api/user/insert`,
+        formData
+      );
+      setUserData(response.data);
+      setInsertMode(false);
+      toast.success("User data inserted successfully!");
+    } catch (error) {
+      toast.error("Error inserting user data.");
+      console.error("Insert error:", error);
+    }
+  };
+
+  // Update existing user
   const handleSave = async () => {
     try {
       const response = await axios.put(
         `http://localhost:8000/api/user/update/${email}`,
-        {
-          ...formData,
-          dob: new Date(formData.dob).toISOString().split("T")[0], // Format the date before sending it
-        }
+        formData
       );
-      const formattedUser = {
-        ...response.data.user,
-        dob: formatDate(response.data.user.dob), // Format date for display
-      };
-      setUserState(formattedUser);
+      setUserData(response.data);
       toast.success("Profile updated successfully!");
       setEditMode(false);
     } catch (error) {
@@ -85,134 +88,232 @@ const UserProfile = () => {
     }
   };
 
-  if (loading) {
-    return <div className="text-center mt-10">Loading...</div>;
-  }
+  if (loading) return <div className="text-center mt-10">Loading...</div>;
 
   return (
-    <div className="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-        User Profile
+    <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-lg mt-10">
+      <h2 className="text-2xl font-semibold mb-6 text-gray-700 text-center">
+        Your Profile
       </h2>
-      <div className="space-y-4">
-        {/* Username (read-only) */}
-        <div>
-          <label className="block text-gray-600 text-sm">Username</label>
-          {editMode ? (
+
+      {insertMode ? (
+        <div className="space-y-6">
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Username
+            </label>
             <input
               type="text"
               name="username"
               value={formData.username}
-              onChange={handleChange}
-              className="w-full p-2 border rounded-lg"
+              readOnly
+              className="w-full p-3 mt-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"
             />
-          ) : (
-            <p className="text-gray-700">{user.username}</p>
-          )}
-        </div>
-        {/* Email (read-only in edit mode) */}
-        <div>
-          <label className="block text-gray-600 text-sm">Email</label>
-          {editMode ? (
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Email
+            </label>
             <input
               type="email"
               name="email"
               value={formData.email}
               readOnly
-              className="w-full p-2 border rounded-lg bg-gray-100 cursor-not-allowed"
+              className="w-full p-3 mt-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"
             />
-          ) : (
-            <p className="text-gray-700">{user.email}</p>
-          )}
-        </div>
-        {/* Phone */}
-        <div>
-          <label className="block text-gray-600 text-sm">Phone</label>
-          {editMode ? (
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Phone
+            </label>
             <input
               type="text"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full p-2 border rounded-lg"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
             />
-          ) : (
-            <p className="text-gray-700">{user.phone}</p>
-          )}
-        </div>
-        {/* Address */}
-        <div>
-          <label className="block text-gray-600 text-sm">Address</label>
-          {editMode ? (
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Address
+            </label>
             <textarea
               name="address"
               value={formData.address}
               onChange={handleChange}
-              className="w-full p-2 border rounded-lg"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
             />
-          ) : (
-            <p className="text-gray-700">{user.address}</p>
-          )}
-        </div>
-        {/* Gender */}
-        <div>
-          <label className="block text-gray-600 text-sm">Gender</label>
-          {editMode ? (
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Gender
+            </label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
-              className="w-full p-2 border rounded-lg"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
             >
+              <option value="">Select gender</option>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
               <option value="Other">Other</option>
             </select>
-          ) : (
-            <p className="text-gray-700">{user.gender}</p>
-          )}
-        </div>
-        {/* Date of Birth */}
-        <div>
-          <label className="block text-gray-600 text-sm">Date of Birth</label>
-          {editMode ? (
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Date of Birth
+            </label>
             <input
               type="date"
               name="dob"
               value={formData.dob}
               onChange={handleChange}
-              className="w-full p-2 border rounded-lg"
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
             />
-          ) : (
-            <p className="text-gray-700">{user.dob}</p>
-          )}
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              onClick={handleInsert}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+            >
+              Insert
+            </button>
+          </div>
         </div>
-      </div>
-      <div className="mt-6 flex justify-end space-x-4">
-        {editMode ? (
-          <>
+      ) : editMode ? (
+        <div className="space-y-6">
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Username
+            </label>
+            <input
+              type="text"
+              value={userData.username}
+              readOnly
+              className="w-full p-3 mt-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Email
+            </label>
+            <input
+              type="email"
+              value={userData.email}
+              readOnly
+              className="w-full p-3 mt-2 bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Phone
+            </label>
+            <input
+              type="text"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Address
+            </label>
+            <textarea
+              name="address"
+              value={formData.address}
+              onChange={handleChange}
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Gender
+            </label>
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleChange}
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+            >
+              <option value="">Select gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-lg font-medium text-gray-600">
+              Date of Birth
+            </label>
+            <input
+              type="date"
+              name="dob"
+              value={formData.dob}
+              onChange={handleChange}
+              className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
+            />
+          </div>
+
+          <div className="flex justify-end space-x-4">
             <button
               onClick={handleSave}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
             >
               Save
             </button>
             <button
               onClick={() => setEditMode(false)}
-              className="bg-gray-400 text-white px-4 py-2 rounded-lg hover:bg-gray-500"
+              className="bg-gray-400 text-white px-6 py-2 rounded-lg hover:bg-gray-500 transition duration-300"
             >
               Cancel
             </button>
-          </>
-        ) : (
-          <button
-            onClick={() => setEditMode(true)}
-            className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-          >
-            Edit Profile
-          </button>
-        )}
-      </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <p>
+            <strong className="font-semibold text-gray-700">Username:</strong>{" "}
+            {userData.username}
+          </p>
+          <p>
+            <strong className="font-semibold text-gray-700">Email:</strong>{" "}
+            {userData.email}
+          </p>
+          <p>
+            <strong className="font-semibold text-gray-700">Phone:</strong>{" "}
+            {userData.phone}
+          </p>
+          <p>
+            <strong className="font-semibold text-gray-700">Address:</strong>{" "}
+            {userData.address}
+          </p>
+          <p>
+            <strong className="font-semibold text-gray-700">Gender:</strong>{" "}
+            {userData.gender}
+          </p>
+          <p>
+            <strong className="font-semibold text-gray-700">
+              Date of Birth:
+            </strong>{" "}
+            {userData.dob}
+          </p>
+
+          <div className="mt-4">
+            <button
+              onClick={() => setEditMode(true)}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300"
+            >
+              Edit Profile
+            </button>
+          </div>
+        </div>
+      )}
+
       <ToastContainer />
     </div>
   );

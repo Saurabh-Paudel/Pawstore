@@ -51,12 +51,11 @@ const login = async (req, res) => {
     }
 
     // Create JWT token
-    // Assuming you have the user data after successful login
     const payload = {
-      userId: user._id, // Unique ID of the user
-      name: user.name, // User's name
-      email: user.email, // User's email
-      role: user.role, // User's role
+      userId: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
     };
 
     const token = jwt.sign(payload, process.env.SECRET_KEY);

@@ -1,26 +1,81 @@
 import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { logout } from "../../../redux/slices/userSlice"; // Import logout action
 
 export default function UserSettings() {
+  const dispatch = useDispatch();
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const handlePasswordChange = () => {
+  // Get token from Redux store
+  const user = useSelector((state) => state.user);
+  const token = user?.token;
+
+  console.log("Token from Redux:", token);
+
+  // Decode user ID from token
+  let userId = null;
+  if (token) {
+    try {
+      const decodedToken = jwtDecode(token);
+      userId = decodedToken.userId;
+      console.log("Decoded User ID from token:", userId);
+    } catch (error) {
+      console.error("Invalid token", error);
+    }
+  }
+
+  // Handle Password Change
+  const handlePasswordChange = async () => {
     if (newPassword !== confirmPassword) {
       alert("New passwords do not match!");
       return;
     }
-    // API call to update password
-    alert("Password changed successfully!");
+
+    try {
+      const response = await axios.put(
+        "http://localhost:8000/api/account/change-password",
+        { userId, currentPassword, newPassword, confirmPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert(response.data.message);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (error) {
+      console.error("Error changing password:", error);
+      alert(error.response?.data?.message || "Failed to change password");
+    }
   };
 
-  const handleDeleteAccount = () => {
+  // Handle Delete Account
+  const handleDeleteAccount = async () => {
     const confirmDelete = window.confirm(
       "Are you sure you want to delete your account? This action is irreversible."
     );
-    if (confirmDelete) {
-      // API call to delete account
-      alert("Account deleted successfully!");
+    if (!confirmDelete) return;
+
+    try {
+      // First, delete from userModel (users collection)
+      const response = await axios.delete(
+        "http://localhost:8000/api/account/delete-account",
+        { data: { userId, email: user.email } },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      alert(response.data.message);
+
+      // Optionally, you can handle the front-end logout and redirection after both deletions are confirmed
+      dispatch(logout());
+      localStorage.removeItem("user");
+      window.location.replace("/"); // Redirect to home or login page after deletion
+    } catch (error) {
+      console.error("Error deleting account:", error);
+      alert(error.response?.data?.message || "Failed to delete account");
     }
   };
 

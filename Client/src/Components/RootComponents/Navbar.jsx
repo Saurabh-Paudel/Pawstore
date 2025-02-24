@@ -22,7 +22,6 @@ export default function Navbar() {
 
   // Fetch user data from Redux store
   const user = useSelector((state) => state.user);
-  console.log("Redux user:", user); // Debug log
 
   const handleLogout = () => {
     dispatch(logout());
