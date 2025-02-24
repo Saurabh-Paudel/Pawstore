@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import axios from "axios";
 
 const User = () => {
@@ -7,94 +6,68 @@ const User = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const { token, role } = useSelector((state) => state.user);
-
   useEffect(() => {
-    const fetchUsersData = async () => {
+    const fetchUsers = async () => {
       try {
-        if (!token) {
-          setError("You need to login first");
-          setLoading(false);
-          return;
-        }
-
-        if (role !== "admin") {
-          setError("You are not authorized to access this page");
-          setLoading(false);
-          return;
-        }
-
-        // Make sure the Authorization header is correctly formatted
-        console.log("Sending Authorization Header:", `Bearer ${token}`);
-
         const response = await axios.get(
-          "http://localhost:8000/api/auth/users",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          "http://localhost:8000/api/user/users"
         );
-
         setUsers(response.data);
-        setLoading(false);
       } catch (err) {
-        console.error(
-          "Error fetching users:",
-          err.response?.data || err.message
-        );
-
-        if (err.response?.status === 401) {
-          setError("Session expired. Please login again.");
-        } else {
-          setError("Error fetching users data");
-        }
-
+        console.error("Fetch error:", err.response?.data || err.message);
+        setError(err.response?.data?.message || "Error fetching users");
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchUsersData();
-  }, [token, role]); // Dependency array updated
+    fetchUsers();
+  }, []);
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p className="text-red-500">{error}</p>;
 
   return (
-    <div className="space-y-6 p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-3xl font-semibold text-gray-800">User Dashboard</h2>
-      {loading ? (
-        <p>Loading...</p>
-      ) : (
-        <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-6">
-          <table className="min-w-full table-auto">
-            <thead className="bg-gray-200">
+    <div className="p-6">
+      <h2 className="text-xl font-semibold">User List</h2>
+      <div className="overflow-x-auto">
+        <table className="w-full border-collapse border border-gray-300 mt-4">
+          <thead>
+            <tr className="bg-gray-200">
+              <th className="border p-2">#</th>
+              <th className="border p-2">Username</th>
+              <th className="border p-2">Email</th>
+              <th className="border p-2">Phone</th>
+              <th className="border p-2">Address</th>
+              <th className="border p-2">Gender</th>
+              <th className="border p-2">DOB</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.length === 0 ? (
               <tr>
-                <th className="py-3 px-6 text-left text-gray-700">S.No</th>
-                <th className="py-3 px-6 text-left text-gray-700">Name</th>
-                <th className="py-3 px-6 text-left text-gray-700">Email</th>
-                <th className="py-3 px-6 text-left text-gray-700">Role</th>
+                <td colSpan="7" className="border p-2 text-center">
+                  No users found
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {users.length === 0 ? (
-                <tr>
-                  <td colSpan="4" className="text-center py-4 text-gray-500">
-                    No users found.
+            ) : (
+              users.map((user, index) => (
+                <tr key={user.email} className="hover:bg-gray-100">
+                  <td className="border p-2">{index + 1}</td>
+                  <td className="border p-2">{user.username}</td>
+                  <td className="border p-2">{user.email}</td>
+                  <td className="border p-2">{user.phone}</td>
+                  <td className="border p-2">{user.address}</td>
+                  <td className="border p-2">{user.gender}</td>
+                  <td className="border p-2">
+                    {user.dob ? new Date(user.dob).toLocaleDateString() : "N/A"}
                   </td>
                 </tr>
-              ) : (
-                users.map((user, index) => (
-                  <tr key={user.id} className="border-b hover:bg-gray-50">
-                    <td className="py-3 px-6 text-gray-800">{index + 1}</td>
-                    <td className="py-3 px-6 text-gray-800">{user.name}</td>
-                    <td className="py-3 px-6 text-gray-500">{user.email}</td>
-                    <td className="py-3 px-6 text-gray-500">{user.role}</td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
