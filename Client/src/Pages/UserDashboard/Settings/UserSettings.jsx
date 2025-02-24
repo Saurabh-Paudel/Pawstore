@@ -14,15 +14,12 @@ export default function UserSettings() {
   const user = useSelector((state) => state.user);
   const token = user?.token;
 
-  console.log("Token from Redux:", token);
-
   // Decode user ID from token
   let userId = null;
   if (token) {
     try {
       const decodedToken = jwtDecode(token);
       userId = decodedToken.userId;
-      console.log("Decoded User ID from token:", userId);
     } catch (error) {
       console.error("Invalid token", error);
     }

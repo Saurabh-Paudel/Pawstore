@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 
 const UserProfile = () => {
   const { email, username } = useSelector((state) => state.user);
-
   const [userData, setUserData] = useState(null);
   const [formData, setFormData] = useState({
     username: username || "",
@@ -16,21 +15,17 @@ const UserProfile = () => {
     gender: "",
     dob: "",
   });
-
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [insertMode, setInsertMode] = useState(true);
 
-  // Format date to YYYY-MM-DD
   const formatDate = (date) => {
     if (!date) return "";
     return new Date(date).toISOString().split("T")[0];
   };
 
-  // Fetch user data
   useEffect(() => {
     if (!email) return;
-
     const fetchUser = async () => {
       try {
         const response = await axios.get(
@@ -38,8 +33,8 @@ const UserProfile = () => {
         );
         if (response.data) {
           setUserData(response.data);
-          setInsertMode(false); // User exists
           setFormData({ ...response.data, dob: formatDate(response.data.dob) });
+          setInsertMode(false);
         }
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -47,11 +42,9 @@ const UserProfile = () => {
         setLoading(false);
       }
     };
-
     fetchUser();
   }, [email]);
 
-  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -63,12 +56,17 @@ const UserProfile = () => {
         `http://localhost:8000/api/user/insert`,
         formData
       );
-      setUserData(response.data);
+      const insertedUser = response.data.user || response.data;
+      setUserData(insertedUser);
+      setFormData({ ...insertedUser, dob: formatDate(insertedUser.dob) });
       setInsertMode(false);
       toast.success("User data inserted successfully!");
     } catch (error) {
       toast.error("Error inserting user data.");
-      console.error("Insert error:", error);
+      console.error(
+        "Insert error:",
+        error.response ? error.response.data : error
+      );
     }
   };
 
@@ -79,7 +77,9 @@ const UserProfile = () => {
         `http://localhost:8000/api/user/update/${email}`,
         formData
       );
-      setUserData(response.data);
+      const updatedUser = response.data.user || response.data;
+      setUserData(updatedUser);
+      setFormData({ ...updatedUser, dob: formatDate(updatedUser.dob) });
       toast.success("Profile updated successfully!");
       setEditMode(false);
     } catch (error) {
@@ -173,7 +173,6 @@ const UserProfile = () => {
               className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
             />
           </div>
-
           <div className="flex justify-end">
             <button
               onClick={handleInsert}
@@ -258,7 +257,6 @@ const UserProfile = () => {
               className="w-full p-3 mt-2 border border-gray-300 rounded-lg"
             />
           </div>
-
           <div className="flex justify-end space-x-4">
             <button
               onClick={handleSave}
@@ -302,7 +300,6 @@ const UserProfile = () => {
             </strong>{" "}
             {userData.dob}
           </p>
-
           <div className="mt-4">
             <button
               onClick={() => setEditMode(true)}
