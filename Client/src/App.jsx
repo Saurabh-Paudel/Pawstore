@@ -22,6 +22,7 @@ import BlogSection from "./Pages/Client/Blog";
 import Login from "./Pages/Authentication/Login";
 import SignUp from "./Pages/Authentication/SignUp";
 import DogSales from "./Pages/Client/DogSales";
+import BuyNow from "./Pages/Client/BuyNow";
 
 // UserDashboard Pages
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
@@ -92,6 +93,7 @@ const App = () => {
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
         <Route path="dog-sales" element={<DogSales />} />
+        <Route path="dog-sales/buy/:id" element={<BuyNow />} />
       </Route>
 
       {userData.token && userData.role === "buyer" && (
