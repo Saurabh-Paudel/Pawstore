@@ -21,6 +21,7 @@ import AccessoriesPage from "./Pages/Client/Accessories";
 import BlogSection from "./Pages/Client/Blog";
 import Login from "./Pages/Authentication/Login";
 import SignUp from "./Pages/Authentication/SignUp";
+import DogSales from "./Pages/Client/DogSales";
 
 // UserDashboard Pages
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
@@ -90,6 +91,7 @@ const App = () => {
         <Route path="blogs" element={<BlogSection />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
+        <Route path="dog-sales" element={<DogSales />} />
       </Route>
 
       {userData.token && userData.role === "buyer" && (
@@ -110,7 +112,7 @@ const App = () => {
           <Route path="dog-breeds/update" element={<UpdateDogBreed />} />
           <Route path="dog" element={<Dogs />} />
           <Route path="dog/insert" element={<DogInsert />} />
-          <Route path="dog/update" element={<DogUpdate />} />
+          <Route path="dog/update/:id" element={<DogUpdate />} />
           <Route path="pet-products" element={<DogProducts />} />
           <Route path="pet-products/insert" element={<InsertDogProduct />} />
           <Route path="pet-products/update" element={<UpdateDogProduct />} />

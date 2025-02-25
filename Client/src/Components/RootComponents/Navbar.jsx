@@ -65,6 +65,7 @@ export default function Navbar() {
             { name: "Accessories", path: "/accessories" },
             { name: "Blogs", path: "/blogs" },
             { name: "Contact", path: "/contact" },
+            { name: "Dogs-Sales", path: "/dog-sales" },
           ].map(({ name, path }) => (
             <li key={path} className="hover:font-medium">
               <Link to={path} onClick={closeMenu}>
