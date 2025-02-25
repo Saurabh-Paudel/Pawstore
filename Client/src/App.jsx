@@ -111,7 +111,7 @@ const App = () => {
           <Route index element={<AdminDashboard />} />
           <Route path="dog-breeds" element={<DogBreed />} />
           <Route path="dog-breeds/insert" element={<InsertDogBreed />} />
-          <Route path="dog-breeds/update" element={<UpdateDogBreed />} />
+          <Route path="dog-breeds/update/:id" element={<UpdateDogBreed />} />
           <Route path="dog" element={<Dogs />} />
           <Route path="dog/insert" element={<DogInsert />} />
           <Route path="dog/update/:id" element={<DogUpdate />} />
