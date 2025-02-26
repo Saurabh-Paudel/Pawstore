@@ -28,6 +28,7 @@ import BuyNow from "./Pages/Client/BuyNow";
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
 import UserProfile from "./Pages/UserDashboard/UserProfile/UserProfile";
 import MyOrders from "./Pages/UserDashboard/MyOrder/MyOrders";
+import MyMessage from "./Pages/UserDashboard/Message/userMessage";
 import UserNewsletter from "./Pages/UserDashboard/Newsletter/UserNewsletter";
 import UserSettings from "./Pages/UserDashboard/Settings/UserSettings";
 
@@ -101,6 +102,7 @@ const App = () => {
           <Route index element={<UserDashboard />} />
           <Route path="user-profile" element={<UserProfile />} />
           <Route path="my-orders" element={<MyOrders />} />
+          <Route path="my-messages" element={<MyMessage />} />
           <Route path="user-newsletter" element={<UserNewsletter />} />
           <Route path="settings" element={<UserSettings />} />
         </Route>

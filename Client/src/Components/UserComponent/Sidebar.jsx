@@ -7,6 +7,7 @@ import {
   FaCog,
   FaSignOutAlt,
   FaHome,
+  FaEnvelope,
 } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -66,6 +67,15 @@ const Sidebar = () => {
             >
               <FaNewspaper className="text-xl" />
               <span>Newsletters</span>
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="my-messages"
+              className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
+            >
+              <FaEnvelope className="text-xl" />
+              <span>Messages</span>
             </Link>
           </li>
           <li>
