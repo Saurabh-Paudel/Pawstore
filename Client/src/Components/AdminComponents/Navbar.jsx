@@ -2,13 +2,8 @@ import React from "react";
 
 function Navbar() {
   return (
-    <div className="bg-white shadow-md p-4 flex justify-between items-center">
+    <div className="bg-white shadow-md p-6 flex justify-center items-center">
       <h1 className="text-xl font-bold">Admin Dashboard</h1>
-      <div className="flex items-center space-x-4">
-        <button className="bg-gray-200 p-2 rounded-full hover:bg-gray-300">
-          <span>👤</span>
-        </button>
-      </div>
     </div>
   );
 }
