@@ -1,44 +1,73 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FaPlusCircle, FaEdit, FaTrashAlt } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-const BlogManagement = () => {
+const Blog = () => {
   const [search, setSearch] = useState("");
-  const blogs = [
-    {
-      _id: 1,
-      title: "Blog Title 1",
-      description: "This is a description of Blog 1.",
-      status: "Published",
-      author: "Author 1",
-      createdAt: "2025-01-01",
-      updatedAt: "2025-01-02",
-      publishedAt: "2025-01-03",
-      readCount: 100,
-    },
-    {
-      _id: 2,
-      title: "Blog Title 2",
-      description: "This is a description of Blog 2.",
-      status: "Draft",
-      author: "Author 2",
-      createdAt: "2025-01-05",
-      updatedAt: "2025-01-06",
-      publishedAt: null,
-      readCount: 150,
-    },
-  ];
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Handle Search
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/blogs/get");
+        setBlogs(response.data);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching blogs:", err);
+        setError("Failed to load blogs.");
+        setLoading(false);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
+
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this blog?")) {
+      try {
+        await axios.delete(`http://localhost:8000/api/blogs/delete/${id}`); // Fixed syntax
+        setBlogs(blogs.filter((blog) => blog._id !== id));
+        toast.success("Blog deleted successfully!");
+      } catch (err) {
+        console.error("Error deleting blog:", err);
+        toast.error(
+          "Failed to delete blog: " +
+            (err.response?.data?.message || err.message)
+        );
+      }
+    }
+  };
+
   const filteredBlogs = blogs.filter((blog) =>
     blog.title.toLowerCase().includes(search.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <div className="space-y-6 p-6 bg-gray-100 min-h-screen text-center">
+        <p className="text-lg text-gray-600">Loading blogs...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6 p-6 bg-gray-100 min-h-screen text-center">
+        <p className="text-lg text-red-600">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 p-6 bg-gray-100 min-h-screen">
+      <ToastContainer position="top-right" autoClose={2000} />
       <h2 className="text-3xl font-semibold text-gray-800">Manage Blogs</h2>
 
-      {/* Actions */}
       <div className="flex justify-between items-center">
         <Link to="/admin/blogs/insert">
           <button className="flex items-center space-x-2 text-white bg-gray-600 hover:bg-gray-700 px-5 py-2 rounded-lg shadow-md">
@@ -55,7 +84,6 @@ const BlogManagement = () => {
         />
       </div>
 
-      {/* Blogs Table */}
       <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
         <table className="min-w-full table-auto">
           <thead className="bg-gray-200">
@@ -81,7 +109,8 @@ const BlogManagement = () => {
                   <td className="py-3 px-6 text-gray-800">{index + 1}</td>
                   <td className="py-3 px-6 text-gray-800">{blog.title}</td>
                   <td className="py-3 px-6 text-gray-500">
-                    {blog.description}
+                    {blog.description.replace(/<[^>]+>/g, "").substring(0, 50) +
+                      "..."}
                   </td>
                   <td className="py-3 px-6 text-gray-500">{blog.status}</td>
                   <td className="py-3 px-6 text-gray-500">{blog.author}</td>
@@ -89,7 +118,9 @@ const BlogManagement = () => {
                     {new Date(blog.createdAt).toLocaleDateString()}
                   </td>
                   <td className="py-3 px-6 text-gray-500">
-                    {new Date(blog.updatedAt).toLocaleDateString()}
+                    {blog.updatedAt
+                      ? new Date(blog.updatedAt).toLocaleDateString()
+                      : "N/A"}
                   </td>
                   <td className="py-3 px-6 text-gray-500">
                     {blog.publishedAt
@@ -98,15 +129,13 @@ const BlogManagement = () => {
                   </td>
                   <td className="py-3 px-6 text-gray-500">{blog.readCount}</td>
                   <td className="py-3 px-6 space-x-3">
-                    <Link to="/admin/blogs/update">
+                    <Link to={`/admin/blogs/update/${blog._id}`}>
                       <button className="text-yellow-500 hover:text-yellow-600">
                         <FaEdit />
                       </button>
                     </Link>
                     <button
-                      onClick={() =>
-                        console.log(`Delete blog with ID: ${blog._id}`)
-                      }
+                      onClick={() => handleDelete(blog._id)}
                       className="text-red-500 hover:text-red-600"
                     >
                       <FaTrashAlt />
@@ -116,7 +145,7 @@ const BlogManagement = () => {
               ))
             ) : (
               <tr>
-                <td colSpan="9" className="text-center py-4 text-gray-500">
+                <td colSpan="10" className="text-center py-4 text-gray-500">
                   No blogs found.
                 </td>
               </tr>
@@ -128,4 +157,4 @@ const BlogManagement = () => {
   );
 };
 
-export default BlogManagement;
+export default Blog;

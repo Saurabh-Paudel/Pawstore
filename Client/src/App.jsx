@@ -20,6 +20,7 @@ import Breed from "./Pages/Client/Breed";
 import AccessoriesPage from "./Pages/Client/Accessories";
 import ProductDetail from "./Pages/Client/ProductDetail";
 import BlogSection from "./Pages/Client/Blog";
+import DetailedBlogSection from "./Pages/Client/BlogDetail";
 import Login from "./Pages/Authentication/Login";
 import SignUp from "./Pages/Authentication/SignUp";
 import DogSales from "./Pages/Client/DogSales";
@@ -93,6 +94,7 @@ const App = () => {
         <Route path="accessories" element={<AccessoriesPage />} />
         <Route path="accessories-details/:id" element={<ProductDetail />} />
         <Route path="blogs" element={<BlogSection />} />
+        <Route path="blog-details/:id" element={<DetailedBlogSection />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
         <Route path="dog-sales" element={<DogSales />} />
@@ -127,7 +129,7 @@ const App = () => {
           />
           <Route path="blogs" element={<BlogsManagement />} />
           <Route path="blogs/insert" element={<InsertBlog />} />
-          <Route path="blogs/update" element={<UpdateBlog />} />
+          <Route path="blogs/update/:id" element={<UpdateBlog />} />
           <Route path="newsletters" element={<Newsletter />} />
           <Route path="messages" element={<MessageDashboard />} />
           <Route path="sales/dogs" element={<DogsSales />} />

@@ -3,30 +3,49 @@ import { FaTimes } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function UpdateBlog() {
   const navigate = useNavigate();
   const { id } = useParams();
+
   const [blog, setBlog] = useState({
     title: "",
     description: "",
-    tags: "",
+    tags: [],
     author: "",
+    status: "Draft",
   });
+  const [tagInput, setTagInput] = useState("");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
   useEffect(() => {
-    // Fetch existing blog data (static for now)
-    const existingBlog = {
-      title: "Sample Blog",
-      description: "<p>This is an example blog description.</p>",
-      image: "https://example.com/sample.jpg",
-      tags: "React, JavaScript",
-      author: "John Doe",
+    const fetchBlog = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:8000/api/blogs/get/${id}`
+        );
+        const fetchedBlog = response.data;
+        setBlog({
+          title: fetchedBlog.title,
+          description: fetchedBlog.description,
+          tags: fetchedBlog.tags || [],
+          author: fetchedBlog.author,
+          status: fetchedBlog.status || "Draft",
+        });
+        if (fetchedBlog.image) {
+          setPreview(`http://localhost:8000${fetchedBlog.image}`);
+        }
+      } catch (error) {
+        console.error("Error fetching blog:", error);
+        toast.error("Failed to load blog data.");
+      }
     };
-    setBlog(existingBlog);
-    setPreview(existingBlog.image);
+
+    fetchBlog();
   }, [id]);
 
   const handleChange = (e) => {
@@ -45,26 +64,55 @@ export default function UpdateBlog() {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleAddTag = () => {
+    if (tagInput.trim() && !blog.tags.includes(tagInput.trim())) {
+      setBlog((prev) => ({ ...prev, tags: [...prev.tags, tagInput.trim()] }));
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove) => {
+    setBlog((prev) => ({
+      ...prev,
+      tags: prev.tags.filter((tag) => tag !== tagToRemove),
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create FormData for API submission
     const formData = new FormData();
     formData.append("title", blog.title);
     formData.append("description", blog.description);
-    formData.append("tags", blog.tags);
+    blog.tags.forEach((tag) => formData.append("tags", tag));
     formData.append("author", blog.author);
+    formData.append("status", blog.status);
     if (image) {
       formData.append("image", image);
     }
 
-    console.log("Updated Blog Data:", formData);
-
-    navigate("/admin/blogs");
+    try {
+      await axios.put(
+        `http://localhost:8000/api/blogs/update/${id}`,
+        formData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
+      toast.success("Blog updated successfully!");
+      setTimeout(() => navigate("/admin/blogs"), 2000);
+    } catch (error) {
+      console.error("Error updating blog:", error.response?.data || error);
+      toast.error(
+        "Failed to update blog: " +
+          (error.response?.data?.message || error.message)
+      );
+    }
   };
 
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
+      <ToastContainer position="top-right" autoClose={2000} />
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-semibold text-gray-800">Update Blog</h2>
         <button
@@ -76,56 +124,113 @@ export default function UpdateBlog() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          type="text"
-          name="title"
-          value={blog.title}
-          onChange={handleChange}
-          placeholder="Title"
-          className="w-full p-2 border border-gray-300 rounded"
-          required
-        />
-
-        <ReactQuill
-          value={blog.description}
-          onChange={handleDescriptionChange}
-          className="bg-white"
-          theme="snow"
-        />
-
-        {/* Image Upload */}
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleImageChange}
-          className="w-full p-2 border border-gray-300 rounded"
-        />
-
-        {preview && (
-          <img
-            src={preview}
-            alt="Preview"
-            className="w-full h-48 object-cover mt-2 rounded shadow-md"
+        <div className="flex flex-col space-y-2">
+          <label className="text-lg font-medium text-gray-700">Title</label>
+          <input
+            type="text"
+            name="title"
+            value={blog.title}
+            onChange={handleChange}
+            placeholder="Enter blog title"
+            className="w-full p-2 border border-gray-300 rounded"
+            required
           />
-        )}
+        </div>
 
-        <input
-          type="text"
-          name="tags"
-          value={blog.tags}
-          onChange={handleChange}
-          placeholder="Tags (comma separated)"
-          className="w-full p-2 border border-gray-300 rounded"
-        />
+        <div className="flex flex-col space-y-2">
+          <label className="text-lg font-medium text-gray-700">
+            Description
+          </label>
+          <ReactQuill
+            value={blog.description}
+            onChange={handleDescriptionChange}
+            className="bg-white"
+            theme="snow"
+            placeholder="Write your blog content here..."
+          />
+        </div>
 
-        <input
-          type="text"
-          name="author"
-          value={blog.author}
-          onChange={handleChange}
-          placeholder="Author Name"
-          className="w-full p-2 border border-gray-300 rounded"
-        />
+        <div className="flex flex-col space-y-2">
+          <label className="text-lg font-medium text-gray-700">
+            Image (Optional)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+          {preview && (
+            <img
+              src={preview}
+              alt="Preview"
+              className="w-full h-48 object-cover mt-2 rounded shadow-md"
+            />
+          )}
+        </div>
+
+        <div className="flex flex-col space-y-2">
+          <label className="text-lg font-medium text-gray-700">Tags</label>
+          <div className="flex space-x-2">
+            <input
+              type="text"
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="Enter a tag and press Add"
+              className="w-full p-2 border border-gray-300 rounded"
+            />
+            <button
+              type="button"
+              onClick={handleAddTag}
+              className="p-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              Add
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2 mt-2">
+            {blog.tags.map((tag, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-gray-200 rounded-full flex items-center"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  className="ml-2 text-red-600"
+                >
+                  ✕
+                </button>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-col space-y-2">
+          <label className="text-lg font-medium text-gray-700">Author</label>
+          <input
+            type="text"
+            name="author"
+            value={blog.author}
+            onChange={handleChange}
+            placeholder="Enter author name"
+            className="w-full p-2 border border-gray-300 rounded"
+            required
+          />
+        </div>
+
+        <div className="flex flex-col space-y-2">
+          <label className="text-lg font-medium text-gray-700">Status</label>
+          <select
+            name="status"
+            value={blog.status}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded"
+          >
+            <option value="Draft">Draft</option>
+            <option value="Published">Published</option>
+          </select>
+        </div>
 
         <button
           type="submit"
