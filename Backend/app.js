@@ -10,6 +10,7 @@ const accountManagementRoutes = require("./routes/accountManagementRoutes");
 const dogRoutes = require("./routes/dogRoutes");
 const breedRoutes = require("./routes/dogBreedRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 
@@ -31,6 +32,7 @@ app.use("/api/account", accountManagementRoutes);
 app.use("/api/dogs", dogRoutes);
 app.use("/api/breeds", breedRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/products", productRoutes);
 
 app.get("/", function (req, res) {
   res.send("Hello World");

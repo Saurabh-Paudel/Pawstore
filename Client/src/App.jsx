@@ -18,6 +18,7 @@ import CareersSection from "./Pages/Client/Career";
 import ContactUs from "./Pages/Client/Contact";
 import Breed from "./Pages/Client/Breed";
 import AccessoriesPage from "./Pages/Client/Accessories";
+import ProductDetail from "./Pages/Client/ProductDetail";
 import BlogSection from "./Pages/Client/Blog";
 import Login from "./Pages/Authentication/Login";
 import SignUp from "./Pages/Authentication/SignUp";
@@ -90,6 +91,7 @@ const App = () => {
         <Route path="contact" element={<ContactUs />} />
         <Route path="breeds" element={<Breed />} />
         <Route path="accessories" element={<AccessoriesPage />} />
+        <Route path="accessories-details/:id" element={<ProductDetail />} />
         <Route path="blogs" element={<BlogSection />} />
         <Route path="login" element={<Login />} />
         <Route path="signup" element={<SignUp />} />
@@ -119,7 +121,10 @@ const App = () => {
           <Route path="dog/update/:id" element={<DogUpdate />} />
           <Route path="pet-products" element={<DogProducts />} />
           <Route path="pet-products/insert" element={<InsertDogProduct />} />
-          <Route path="pet-products/update" element={<UpdateDogProduct />} />
+          <Route
+            path="pet-products/update/:id"
+            element={<UpdateDogProduct />}
+          />
           <Route path="blogs" element={<BlogsManagement />} />
           <Route path="blogs/insert" element={<InsertBlog />} />
           <Route path="blogs/update" element={<UpdateBlog />} />
