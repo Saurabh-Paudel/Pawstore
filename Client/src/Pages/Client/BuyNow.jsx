@@ -7,68 +7,99 @@ export default function BuyNow() {
   const { dog } = location.state || {};
 
   if (!dog) {
-    return <div className="text-center mt-10 text-xl">Dog not found.</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-amber-100">
+        <div className="text-2xl text-amber-800 font-semibold flex items-center space-x-2">
+          <span>Oops! Dog not found</span>
+          <span className="text-3xl">🐾</span>
+        </div>
+      </div>
+    );
   }
 
   const handleBuyNow = () => {
-    // Navigate to the checkout page or handle the purchase process here
-    // For example:
-    navigate("/checkout", { state: { dog } });
+    navigate("/dog-checkout", { state: { dog } });
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center p-6 bg-gray-100">
-      <div className="max-w-2xl bg-white shadow-lg rounded-lg p-6">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 to-white py-12 px-6 flex items-center justify-center">
+      <div className="relative max-w-2xl w-full bg-white rounded-3xl shadow-lg p-8 transform transition-all duration-300 hover:shadow-xl border border-amber-100">
+        {/* Decorative Paw Prints */}
+        <div className="absolute -top-6 -left-6 w-12 h-12 bg-amber-300 rounded-full opacity-20"></div>
+        <div className="absolute -bottom-6 -right-6 w-16 h-16 bg-amber-200 rounded-full opacity-30"></div>
+
         {/* Dog Image */}
-        <img
-          src={dog.image}
-          alt={dog.name}
-          className="w-full h-80 object-cover rounded-lg"
-        />
+        <div className="relative overflow-hidden rounded-2xl mb-6">
+          <img
+            src={dog.image}
+            alt={dog.name}
+            className="w-full h-80 object-cover transition-transform duration-500 hover:scale-105"
+          />
+          <div
+            className={`absolute top-4 right-4 px-3 py-1 rounded-full text-white font-semibold text-sm ${
+              dog.status === "Available" ? "bg-green-500" : "bg-red-500"
+            }`}
+          >
+            {dog.status}
+          </div>
+        </div>
 
         {/* Dog Details */}
-        <h2 className="text-3xl font-bold text-gray-900 mt-4">{dog.name}</h2>
-        <p className="text-gray-600 text-lg">{dog.breed}</p>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <h2 className="text-4xl font-bold text-amber-800">{dog.name}</h2>
+            <span className="text-2xl text-amber-500">🐶</span>
+          </div>
+          <p className="text-gray-500 italic text-lg">{dog.breed}</p>
 
-        <div className="mt-4">
-          <p className="text-gray-700">
-            <span className="font-semibold">Age:</span> {dog.age} years
-          </p>
-          <p className="text-gray-700">
-            <span className="font-semibold">Vaccinated:</span>{" "}
-            {dog.vaccinated ? "Yes ✅" : "No ❌"}
-          </p>
-          <p className="text-gray-700 mt-2">{dog.description}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-amber-50 p-4 rounded-xl border border-amber-200">
+            <div className="space-y-2">
+              <p className="text-gray-700">
+                <strong className="text-amber-900">Age:</strong> {dog.age} years
+              </p>
+              <p className="text-gray-700">
+                <strong className="text-amber-900">Vaccinated:</strong>{" "}
+                <span
+                  className={
+                    dog.vaccinated === "Yes" ? "text-green-600" : "text-red-600"
+                  }
+                >
+                  {dog.vaccinated === "Yes" ? "Yes ✅" : "No ❌"}
+                </span>
+              </p>
+            </div>
+            <div className="flex items-center justify-center md:justify-end">
+              <p className="text-2xl font-bold text-amber-900">
+                Rs. {dog.price}
+              </p>
+            </div>
+          </div>
+
+          <p className="text-gray-600 leading-relaxed">{dog.description}</p>
         </div>
 
-        <p className="text-xl font-bold text-gray-900 mt-4">Rs.{dog.price}</p>
-
-        {/* Dog Availability Status */}
-        <p
-          className={`mt-2 text-lg font-semibold ${
-            dog.status === "Available" ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          {dog.status}
-        </p>
-
-        <div className="flex  gap-5">
-          {/* Buy Now Button */}
+        {/* Action Buttons */}
+        <div className="mt-8 flex gap-4">
           <button
             onClick={handleBuyNow}
-            className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg transition-colors duration-300 hover:bg-blue-700"
+            className="flex-1 bg-amber-500 text-white py-3 rounded-lg font-semibold hover:bg-amber-600 transition-colors duration-300 flex items-center justify-center space-x-2"
           >
-            Buy Now
+            <span>Buy Now</span>
+            <span className="text-xl">🛒</span>
           </button>
-
-          {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 w-full bg-gray-700 text-white py-2 rounded-lg transition-colors duration-300 hover:bg-gray-900"
+            className="flex-1 bg-gray-600 text-white py-3 rounded-lg font-semibold hover:bg-gray-700 transition-colors duration-300 flex items-center justify-center space-x-2"
           >
-            Back
+            <span className="text-xl">←</span>
+            <span>Back</span>
           </button>
         </div>
+
+        {/* Footer Note */}
+        <p className="text-sm text-gray-500 mt-6 text-center">
+          Bring {dog.name} home today! 🐾
+        </p>
       </div>
     </div>
   );

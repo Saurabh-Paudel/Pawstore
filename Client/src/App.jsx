@@ -25,6 +25,9 @@ import Login from "./Pages/Authentication/Login";
 import SignUp from "./Pages/Authentication/SignUp";
 import DogSales from "./Pages/Client/DogSales";
 import BuyNow from "./Pages/Client/BuyNow";
+import DogCheckout from "./Pages/Client/DogCheckout";
+import PaymentSuccess from "./Pages/Client/PaymentSuccess";
+import PaymentFailure from "./Pages/Client/PaymentFailure";
 
 // UserDashboard Pages
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
@@ -99,6 +102,9 @@ const App = () => {
         <Route path="signup" element={<SignUp />} />
         <Route path="dog-sales" element={<DogSales />} />
         <Route path="dog-sales/buy/:id" element={<BuyNow />} />
+        <Route path="/dog-checkout" element={<DogCheckout />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path="/payment-failure" element={<PaymentFailure />} />
       </Route>
 
       {userData.token && userData.role === "buyer" && (
