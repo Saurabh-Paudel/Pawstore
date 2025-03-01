@@ -1,4 +1,4 @@
-// components/DogCheckout.jsx
+// components/AccessoryCheckout.jsx
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -13,39 +13,41 @@ const generateSignature = (totalAmount, transactionUuid) => {
   return CryptoJS.enc.Base64.stringify(hash);
 };
 
-export default function DogCheckout() {
+export default function AccessoryCheckout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { dog } = location.state || {};
+  const { accessory } = location.state || {};
   const [loading, setLoading] = useState(false);
 
   const userState = useSelector((state) => state.user);
   const token = userState.token;
 
-  if (!dog) {
+  if (!accessory) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-amber-100">
         <div className="text-2xl text-amber-800 font-semibold">
-          Oops! Dog not found 🐾
+          Oops! Accessory not found 🛍️
         </div>
       </div>
     );
   }
 
-  const { _id: dogId, price, age, vaccinated, image, breed, name } = dog;
-  if (!dogId || !price || !age || !vaccinated || !image || !breed) {
-    console.error("Missing dog data:", {
-      dogId,
-      price,
-      age,
-      vaccinated,
-      image,
-      breed,
-    });
+  const {
+    _id: accessoryId,
+    price,
+    quantity,
+    color,
+    size,
+    image,
+    name,
+    description,
+  } = accessory;
+
+  if (!accessoryId || !price || !quantity || !image || !name || !description) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-amber-100">
         <div className="text-2xl text-amber-800 font-semibold">
-          Oops! Incomplete dog data 🐾
+          Oops! Incomplete accessory data 🛍️
         </div>
       </div>
     );
@@ -54,7 +56,7 @@ export default function DogCheckout() {
   const transactionUuid = `${Date.now()}-${Math.random()
     .toString(36)
     .slice(-9)}`;
-  const totalAmount = price.toString();
+  const totalAmount = (price * quantity).toString();
 
   const handlePayment = async () => {
     setLoading(true);
@@ -64,7 +66,7 @@ export default function DogCheckout() {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/payments/dog-purchase/initiate",
+        "http://localhost:8000/api/payments/accessory-purchase/initiate",
         {
           method: "POST",
           headers: {
@@ -72,13 +74,16 @@ export default function DogCheckout() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            dogId,
-            amount: price,
+            accessoryId,
+            amount: price * quantity,
             transactionUuid,
-            age,
-            vaccinated,
+            quantity,
+            color,
+            size,
             image,
-            breed,
+            name,
+            description,
+            price,
           }),
         }
       );
@@ -126,11 +131,8 @@ export default function DogCheckout() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 flex items-center justify-center p-6">
       <div className="relative max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 transform hover:scale-105 transition-all duration-300">
-        <div className="absolute -top-6 -left-6 w-12 h-12 bg-amber-400 rounded-full opacity-20"></div>
-        <div className="absolute -top-4 -left-4 w-8 h-8 bg-amber-500 rounded-full opacity-30"></div>
-
         <h2 className="text-3xl font-bold text-amber-800 mb-6 flex items-center">
-          <span className="mr-2">🐶</span> Adopt {name}!
+          <span className="mr-2">🛍️</span> Purchase {name}!
         </h2>
 
         <div className="space-y-6">
@@ -145,9 +147,9 @@ export default function DogCheckout() {
               </div>
               <div>
                 <p className="text-lg font-semibold text-gray-800">{name}</p>
-                <p className="text-amber-700">{breed}</p>
+                <p className="text-amber-700">{description.slice(0, 30)}...</p>
                 <p className="text-xl font-bold text-amber-900 mt-1">
-                  Rs. {price}
+                  Rs. {price} x {quantity} = Rs. {price * quantity}
                 </p>
               </div>
             </div>
@@ -157,7 +159,7 @@ export default function DogCheckout() {
             <div className="flex justify-between items-center mb-4">
               <span className="text-gray-600">Total Amount</span>
               <span className="text-xl font-bold text-amber-900">
-                Rs. {price}
+                Rs. {price * quantity}
               </span>
             </div>
             <button
@@ -200,7 +202,7 @@ export default function DogCheckout() {
         </div>
 
         <p className="text-sm text-gray-500 mt-6 text-center">
-          Your new furry friend is just one click away! 🐾
+          Your accessory is just one click away! 🛍️
         </p>
       </div>
     </div>

@@ -19,6 +19,7 @@ import ContactUs from "./Pages/Client/Contact";
 import Breed from "./Pages/Client/Breed";
 import AccessoriesPage from "./Pages/Client/Accessories";
 import ProductDetail from "./Pages/Client/ProductDetail";
+import AccessoryCheckout from "./Pages/Client/AccessoryCheckout";
 import BlogSection from "./Pages/Client/Blog";
 import DetailedBlogSection from "./Pages/Client/BlogDetail";
 import Login from "./Pages/Authentication/Login";
@@ -96,6 +97,7 @@ const App = () => {
         <Route path="breeds" element={<Breed />} />
         <Route path="accessories" element={<AccessoriesPage />} />
         <Route path="accessories-details/:id" element={<ProductDetail />} />
+        <Route path="/accessory-checkout" element={<AccessoryCheckout />} />
         <Route path="blogs" element={<BlogSection />} />
         <Route path="blog-details/:id" element={<DetailedBlogSection />} />
         <Route path="login" element={<Login />} />

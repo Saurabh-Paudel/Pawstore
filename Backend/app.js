@@ -13,6 +13,8 @@ const breedRoutes = require("./routes/dogBreedRoutes");
 const messageRoutes = require("./routes/messageRoutes");
 const productRoutes = require("./routes/productRoutes");
 const blogRoutes = require("./routes/blogRoutes");
+const dogPurchaseRoutes = require("./routes/dogPurchaseRoutes");
+const accessoryPurchaseRoutes = require("./routes/accessoryPurchaseRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 
 const app = express();
@@ -37,6 +39,8 @@ app.use("/api/breeds", breedRoutes);
 app.use("/api/messages", messageRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/blogs", blogRoutes);
+app.use("/api/payments/dog-purchase", dogPurchaseRoutes);
+app.use("/api/payments/accessory-purchase", accessoryPurchaseRoutes);
 app.use("/api/payments", paymentRoutes);
 
 // Error handling middleware
