@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import CryptoJS from "crypto-js";
 
-const secretKey = "8gBm/:&EnhH.1/q"; // Matches .env ESEWA_SECRET_KEY
-const productCode = "EPAYTEST"; // Matches .env ESEWA_PRODUCT_CODE
+const secretKey = "8gBm/:&EnhH.1/q";
+const productCode = "EPAYTEST";
 
 const generateSignature = (totalAmount, transactionUuid) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
@@ -33,7 +33,7 @@ export default function DogCheckout() {
   }
 
   const { _id: dogId, price, age, vaccinated, image, breed, name } = dog;
-  if (!dogId || !price || !age || !vaccinated || !image || !breed) {
+  if (!dogId || !price || !age || !vaccinated || !image || !breed || !name) {
     console.error("Missing dog data:", {
       dogId,
       price,
@@ -41,6 +41,7 @@ export default function DogCheckout() {
       vaccinated,
       image,
       breed,
+      name,
     });
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-amber-100">
@@ -79,6 +80,7 @@ export default function DogCheckout() {
             vaccinated,
             image,
             breed,
+            name,
           }),
         }
       );

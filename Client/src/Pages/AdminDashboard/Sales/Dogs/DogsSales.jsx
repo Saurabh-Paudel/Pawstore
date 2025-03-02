@@ -1,125 +1,158 @@
-import React, { useState } from "react";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const DogsSales = () => {
-  const [dogs, setDogs] = useState([
-    {
-      id: 1,
-      name: "Golden Retriever",
-      breed: "Golden Retriever",
-      price: "$1200",
-      age: "2 Years",
-      vaccinated: "Yes",
-      status: "Available",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      name: "Bulldog",
-      breed: "English Bulldog",
-      price: "$1500",
-      age: "1.5 Years",
-      vaccinated: "Yes",
-      status: "Sold",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 3,
-      name: "Beagle",
-      breed: "Beagle",
-      price: "$800",
-      age: "1 Year",
-      vaccinated: "No",
-      status: "Available",
-      image: "https://via.placeholder.com/150",
-    },
-  ]);
+  const [dogs, setDogs] = useState([]);
+  const [filteredDogs, setFilteredDogs] = useState([]); // Filtered list for display
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [search, setSearch] = useState(""); // Search input state
+  const { token, role } = useSelector((state) => state.user);
 
-  const [statusChanged, setStatusChanged] = useState(
-    dogs.reduce((acc, dog) => {
-      acc[dog.id] = false; // Initially, status hasn't been changed for any dog
-      return acc;
-    }, {})
-  );
+  useEffect(() => {
+    if (!token) {
+      setError("Please log in to view dog purchases.");
+      setLoading(false);
+      return;
+    }
 
-  const handleStatusChange = (id, newStatus) => {
-    setDogs(
-      dogs.map((dog) => (dog.id === id ? { ...dog, status: newStatus } : dog))
+    const fetchDogPurchases = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/payments/dog-purchase/dog-purchases",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setDogs(response.data);
+        setFilteredDogs(response.data); // Initially show all dogs
+      } catch (err) {
+        setError("Failed to load dog sales data: " + (err.response?.data?.message || err.message));
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDogPurchases();
+  }, [token]);
+
+  // Filter dogs based on search input
+  useEffect(() => {
+    const filtered = dogs.filter(
+      (dog) =>
+        dog.userId.toString().toLowerCase().includes(search.toLowerCase()) ||
+        dog.transactionUuid.toLowerCase().includes(search.toLowerCase())
     );
-    setStatusChanged({
-      ...statusChanged,
-      [id]: newStatus !== dogs.find((dog) => dog.id === id).status, // Track if status has changed
-    });
+    setFilteredDogs(filtered);
+  }, [search, dogs]);
+
+  const updateShippingStatus = async (dogId, newStatus) => {
+    if (role !== "admin") {
+      toast.error("You are not authorized to update shipping status.");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/api/payments/dog-purchase/dog-purchases/${dogId}`,
+        { deliveryStatus: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setDogs((prevDogs) =>
+        prevDogs.map((dog) =>
+          dog._id === dogId ? { ...dog, deliveryStatus: response.data.purchase.deliveryStatus } : dog
+        )
+      );
+      toast.success("Shipping status updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update shipping status: " + (error.response?.data?.message || error.message));
+    }
   };
 
-  return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-semibold text-gray-800">
-        Manage Dogs Sales
-      </h2>
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p className="text-red-600">{error}</p>;
 
-      <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-6">
-        <table className="min-w-full table-auto">
-          <thead className="bg-gray-200">
-            <tr>
-              <th className="py-3 px-6 text-left text-gray-700">S.No</th>
-              <th className="py-3 px-6 text-left text-gray-700">Image</th>
-              <th className="py-3 px-6 text-left text-gray-700">Dog Name</th>
-              <th className="py-3 px-6 text-left text-gray-700">Breed</th>
-              <th className="py-3 px-6 text-left text-gray-700">Price</th>
-              <th className="py-3 px-6 text-left text-gray-700">Age</th>
-              <th className="py-3 px-6 text-left text-gray-700">Vaccinated</th>
-              <th className="py-3 px-6 text-left text-gray-700">Status</th>
-              <th className="py-3 px-6 text-left text-gray-700">Actions</th>
+  return (
+    <div className="p-6">
+      <h2 className="text-3xl font-semibold mb-4">Manage Dog Sales</h2>
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by User ID or Transaction ID..."
+        className="mb-4 p-2 border rounded w-full max-w-md"
+      />
+      <div className="overflow-x-auto">
+        <table className="min-w-full bg-white border border-gray-300 shadow-lg rounded-lg">
+          <thead className="bg-gray-100">
+            <tr className="text-left">
+              <th className="p-3 border">Image</th>
+              <th className="p-3 border">Dog Name</th>
+              <th className="p-3 border">Breed</th>
+              <th className="p-3 border">Age</th>
+              <th className="p-3 border">Vaccinated</th>
+              <th className="p-3 border">Amount</th>
+              <th className="p-3 border">Transaction ID</th>
+              <th className="p-3 border">Payment Status</th>
+              <th className="p-3 border">User ID</th>
+              <th className="p-3 border">Dog ID</th>
+              <th className="p-3 border">Shipping Status</th>
+              <th className="p-3 border">Action</th>
             </tr>
           </thead>
           <tbody>
-            {dogs.map((dog, index) => (
-              <tr key={dog.id} className="border-b hover:bg-gray-50">
-                <td className="py-3 px-6 text-gray-800">{index + 1}</td>
-                <td className="py-3 px-6">
-                  <img
-                    src={dog.image}
-                    alt={dog.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
+            {filteredDogs.map((dog) => (
+              <tr key={dog._id} className="hover:bg-gray-50">
+                <td className="p-3 border">
+                  <img src={dog.image} alt={dog.name} className="w-16 h-16 rounded" />
                 </td>
-                <td className="py-3 px-6 text-gray-800">{dog.name}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.breed}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.price}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.age}</td>
-                <td className="py-3 px-6 text-gray-500">{dog.vaccinated}</td>
-                <td className="py-3 px-6 text-gray-500">
+                <td className="p-3 border">{dog.name}</td>
+                <td className="p-3 border">{dog.breed}</td>
+                <td className="p-3 border">{dog.age} years</td>
+                <td className="p-3 border">{dog.vaccinated ? "✅ Yes" : "❌ No"}</td>
+                <td className="p-3 border text-green-600 font-bold">${dog.amount}</td>
+                <td className="p-3 border">{dog.transactionUuid}</td>
+                <td className={`p-3 border ${dog.status === "COMPLETE" ? "text-green-500" : "text-red-500"}`}>
+                  {dog.status}
+                </td>
+                <td className="p-3 border">{dog.userId.toString()}</td>
+                <td className="p-3 border">{dog.dogId.toString()}</td>
+                <td className="p-3 border font-semibold">
                   <select
-                    value={dog.status}
-                    onChange={(e) => handleStatusChange(dog.id, e.target.value)}
-                    className="bg-gray-200 p-2 rounded-md"
+                    value={dog.deliveryStatus}
+                    onChange={(e) =>
+                      setDogs((prev) =>
+                        prev.map((d) =>
+                          d._id === dog._id ? { ...d, deliveryStatus: e.target.value } : d
+                        )
+                      )
+                    }
+                    className="p-2 border rounded-md"
                   >
+                    <option value="Processing">Processing</option>
                     <option value="Shipped">Shipped</option>
-                    <option value="Out for Delivery">Out for Delivery</option>
                     <option value="Delivered">Delivered</option>
                   </select>
                 </td>
-                <td className="py-3 px-6 space-x-3">
-                  <Link to={`/admin/sales/dogs/update/${dog.id}`}>
-                    <button
-                      className={`text-white bg-yellow-500 py-2 px-4 rounded-md text-base ${
-                        !statusChanged[dog.id]
-                          ? "cursor-not-allowed opacity-50"
-                          : ""
-                      }`}
-                      disabled={!statusChanged[dog.id]} // Disable the button if status is not changed
-                    >
-                      Update
-                    </button>
-                  </Link>
+                <td className="p-3 border">
+                  <button
+                    onClick={() => updateShippingStatus(dog._id, dog.deliveryStatus)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md"
+                  >
+                    Update
+                  </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <ToastContainer />
     </div>
   );
 };

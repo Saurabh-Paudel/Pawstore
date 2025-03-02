@@ -1,135 +1,251 @@
-import React, { useState } from "react";
-import { FaEdit, FaTrashAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
 
-const DogAccessories = () => {
-  const [products, setProducts] = useState([
-    {
-      id: 1,
-      name: "Dog Leash",
-      price: "$20",
-      status: "Available",
-      description: "A strong and durable dog leash.",
-      color: "Black",
-      size: "Medium",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 2,
-      name: "Dog Bed",
-      price: "$50",
-      status: "Sold",
-      description: "Comfortable bed for your dog.",
-      color: "Gray",
-      size: "Large",
-      image: "https://via.placeholder.com/150",
-    },
-    {
-      id: 3,
-      name: "Dog Collar",
-      price: "$15",
-      status: "Available",
-      description: "Stylish collar for dogs.",
-      color: "Red",
-      size: "Small",
-      image: "https://via.placeholder.com/150",
-    },
-  ]);
+export default function AccessoriesSales() {
+  const [purchases, setPurchases] = useState([]);
+  const [filteredPurchases, setFilteredPurchases] = useState([]); // Filtered list for display
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [statusChanged, setStatusChanged] = useState({});
+  const [search, setSearch] = useState(""); // Search input state
+  const { token, role } = useSelector((state) => state.user);
 
-  const [statusChanged, setStatusChanged] = useState(
-    products.reduce((acc, product) => {
-      acc[product.id] = false; // Initially, status hasn't been changed for any product
-      return acc;
-    }, {})
-  );
+  useEffect(() => {
+    if (!token) {
+      setError("Please log in to view purchase history.");
+      setLoading(false);
+      return;
+    }
 
-  const handleStatusChange = (id, newStatus) => {
-    setProducts(
-      products.map((product) =>
-        product.id === id ? { ...product, status: newStatus } : product
+    const fetchPurchases = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/payments/accessory-purchase/all-purchases",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log("API Response:", response.data);
+        const data = Array.isArray(response.data.purchases)
+          ? response.data.purchases
+          : [];
+        setPurchases(data);
+        setFilteredPurchases(data); // Initially show all purchases
+      } catch (err) {
+        console.error("Fetch error:", err.response?.data || err.message);
+        setError(
+          "Failed to load purchase history: " +
+            (err.response?.data?.message || err.message)
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPurchases();
+  }, [token]);
+
+  // Filter purchases based on search input
+  useEffect(() => {
+    const filtered = purchases.filter(
+      (purchase) =>
+        purchase.userId
+          .toString()
+          .toLowerCase()
+          .includes(search.toLowerCase()) ||
+        purchase.transactionUuid.toLowerCase().includes(search.toLowerCase())
+    );
+    setFilteredPurchases(filtered);
+  }, [search, purchases]);
+
+  const handleStatusChange = (orderId, newStatus) => {
+    setPurchases((prev) =>
+      prev.map((order) =>
+        order._id === orderId ? { ...order, deliveryStatus: newStatus } : order
       )
     );
-    setStatusChanged({
-      ...statusChanged,
-      [id]: newStatus !== products.find((product) => product.id === id).status, // Track if status has changed
-    });
+    setStatusChanged((prev) => ({ ...prev, [orderId]: true }));
   };
 
-  return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-semibold text-gray-800">
-        Manage Dog Accessories
-      </h2>
+  const handleUpdateStatus = async (orderId, newStatus) => {
+    if (role !== "admin") {
+      console.error("Unauthorized: Only admins can update status.");
+      return;
+    }
 
-      <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-6">
-        <table className="min-w-full table-auto">
+    try {
+      const response = await axios.put(
+        `http://localhost:8000/api/payments/accessory-purchase/accessory-purchases/${orderId}`,
+        { deliveryStatus: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      console.log("✅ Status Updated:", response.data);
+      setPurchases((prev) =>
+        prev.map((order) =>
+          order._id === orderId ? { ...order, ...response.data.order } : order
+        )
+      );
+      setStatusChanged((prev) => ({ ...prev, [orderId]: false }));
+    } catch (error) {
+      console.error(
+        "❌ Status Update Failed:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-600">{error}</div>;
+
+  return (
+    <div className="container mx-auto p-6">
+      <h2 className="text-3xl font-bold mb-6">Accessory Purchase History</h2>
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by User ID or Transaction ID..."
+        className="mb-4 p-2 border rounded w-full max-w-md"
+      />
+      <div className="bg-white shadow rounded-lg overflow-auto">
+        <table className="min-w-full table-auto border-collapse border border-gray-300">
           <thead className="bg-gray-200">
             <tr>
-              <th className="py-3 px-6 text-left text-gray-700">S.No</th>
-              <th className="py-3 px-6 text-left text-gray-700">Image</th>
-              <th className="py-3 px-6 text-left text-gray-700">
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                S.No
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Accessory ID
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                User ID
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Transaction ID
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Amount
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Payment Status
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Image
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
                 Product Name
               </th>
-              <th className="py-3 px-6 text-left text-gray-700">Price</th>
-              <th className="py-3 px-6 text-left text-gray-700">Status</th>
-              <th className="py-3 px-6 text-left text-gray-700">Description</th>
-              <th className="py-3 px-6 text-left text-gray-700">Color</th>
-              <th className="py-3 px-6 text-left text-gray-700">Size</th>
-              <th className="py-3 px-6 text-left text-gray-700">Actions</th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Quantity
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Color
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Size
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Price
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Delivery Status
+              </th>
+              <th className="border border-gray-300 py-3 px-4 text-left">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
-            {products.map((product, index) => (
-              <tr key={product.id} className="border-b hover:bg-gray-50">
-                <td className="py-3 px-6 text-gray-800">{index + 1}</td>
-                <td className="py-3 px-6 text-gray-500">
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded-lg"
-                  />
-                </td>
-                <td className="py-3 px-6 text-gray-800">{product.name}</td>
-                <td className="py-3 px-6 text-gray-500">{product.price}</td>
-                <td className="py-3 px-6 text-gray-500">
-                  <select
-                    value={product.status}
-                    onChange={(e) =>
-                      handleStatusChange(product.id, e.target.value)
-                    }
-                    className="bg-gray-200 p-2 rounded-md"
-                  >
-                    <option value="Shipped">Shipped</option>
-                    <option value="Out for Delivery">Out for Delivery</option>
-                    <option value="Delivered">Delivered</option>
-                  </select>
-                </td>
-                <td className="py-3 px-6 text-gray-500">
-                  {product.description}
-                </td>
-                <td className="py-3 px-6 text-gray-500">{product.color}</td>
-                <td className="py-3 px-6 text-gray-500">{product.size}</td>
-                <td className="py-3 px-6 space-x-3">
-                  <Link to={`/admin/pet-products/update/${product.id}`}>
+            {filteredPurchases.length > 0 ? (
+              filteredPurchases.map((purchase, index) => (
+                <tr key={purchase._id} className="border-b hover:bg-gray-50">
+                  <td className="border border-gray-300 py-3 px-4">
+                    {index + 1}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.accessoryId.toString()}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.userId.toString()}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.transactionUuid}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    ${purchase.amount}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.paymentStatus}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    <img
+                      src={purchase.image}
+                      alt={purchase.name}
+                      className="w-16 h-16 object-cover rounded-lg"
+                    />
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.name}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.quantity}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.color || "N/A"}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    {purchase.size || "N/A"}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    ${purchase.price}
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
+                    <select
+                      value={purchase.deliveryStatus}
+                      onChange={(e) =>
+                        handleStatusChange(purchase._id, e.target.value)
+                      }
+                      className="bg-gray-200 p-2 rounded-md"
+                    >
+                      <option value="Processing">Processing</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Out for Delivery">Out for Delivery</option>
+                      <option value="Delivered">Delivered</option>
+                    </select>
+                  </td>
+                  <td className="border border-gray-300 py-3 px-4">
                     <button
+                      onClick={() =>
+                        handleUpdateStatus(
+                          purchase._id,
+                          purchase.deliveryStatus
+                        )
+                      }
                       className={`text-white bg-yellow-500 py-2 px-4 rounded-md text-base ${
-                        !statusChanged[product.id]
+                        !statusChanged[purchase._id]
                           ? "cursor-not-allowed opacity-50"
                           : ""
                       }`}
-                      disabled={!statusChanged[product.id]} // Disable the button if status is not changed
+                      disabled={!statusChanged[purchase._id]}
                     >
                       Update
                     </button>
-                  </Link>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="14" className="text-center py-6 text-gray-600">
+                  No purchases found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
       </div>
     </div>
   );
-};
-
-export default DogAccessories;
+}

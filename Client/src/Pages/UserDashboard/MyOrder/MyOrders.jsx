@@ -1,237 +1,217 @@
-import React, { useState } from "react";
-import { FaStar, FaRegHeart } from "react-icons/fa";
-import { FiMinus, FiPlus } from "react-icons/fi";
-import { TbTruckDelivery } from "react-icons/tb";
-import { HiArrowPath } from "react-icons/hi2";
-
-// Sample data for Dogs orders
-const dogOrders = [
-  {
-    id: "ORD1234",
-    product: "Golden Retriever",
-    date: "2024-02-15",
-    price: "$1200",
-    status: "Shipped",
-  },
-  {
-    id: "ORD5678",
-    product: "Bulldog",
-    date: "2024-02-10",
-    price: "$1500",
-    status: "Processing",
-  },
-  {
-    id: "ORD9101",
-    product: "Beagle",
-    date: "2024-02-05",
-    price: "$800",
-    status: "Delivered",
-  },
-];
-
-// Sample data for Accessories Products
-const products = [
-  {
-    id: "ORD5678",
-    image: "../../assets/AccessoriesImages/collar.png",
-    name: "Dog Collar",
-    rating: 4,
-    reviews: 150,
-    price: "Rs.192.00",
-    description:
-      "A dog collar is a band worn around a dog's neck, used for identification, training, or leash attachment.",
-    colours: ["blue", "red"],
-    sizes: ["XS", "S", "M", "L", "XL"],
-    inStock: true,
-    deliveryStatus: "Processing",
-  },
-  // Additional product objects can be added here.
-];
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 export default function MyOrdersTabs() {
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState("dogs");
+  const [dogOrders, setDogOrders] = useState([]);
+  const [accessoryOrders, setAccessoryOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Filter function for dog orders
-  const filteredDogs = dogOrders.filter(
-    (order) =>
-      order.product.toLowerCase().includes(search.toLowerCase()) ||
-      order.id.toLowerCase().includes(search.toLowerCase())
-  );
+  const { token } = useSelector((state) => state.user);
+  const decodedToken = token ? jwtDecode(token) : null;
+  const userId = decodedToken?.userId || "";
 
-  // Filter function for accessories products (searches both name and id)
-  const filteredAccessories = products.filter(
-    (product) =>
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.id.toLowerCase().toLowerCase().includes(search.toLowerCase())
-  );
+  const fetchDogPurchases = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/payments/dog-purchase/my-dog-purchases",
+        {
+          headers: {
+            Authorization: `Bearer ${token || localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setDogOrders(response.data);
+      if (!response.data || response.data.length === 0) {
+        console.warn("No dog orders returned from the server.");
+      }
+    } catch (err) {
+      console.error(
+        "Error fetching dog purchases:",
+        err.response?.data || err.message
+      );
+      setError(
+        "Failed to load dog orders: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
+  };
 
-  // Render Dogs table
-  const renderDogsTable = (data) => (
-    <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-4">
-      <table className="min-w-full table-auto">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="py-3 px-6 text-left text-gray-700">ID</th>
-            <th className="py-3 px-6 text-left text-gray-700">Product</th>
-            <th className="py-3 px-6 text-left text-gray-700">Date</th>
-            <th className="py-3 px-6 text-left text-gray-700">Price</th>
-            <th className="py-3 px-6 text-left text-gray-700">Status</th>
+  const fetchAccessoryPurchases = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/payments/accessory-purchase/my-purchases",
+        {
+          headers: {
+            Authorization: `Bearer ${token || localStorage.getItem("token")}`,
+          },
+        }
+      );
+      setAccessoryOrders(response.data);
+      if (!response.data || response.data.length === 0) {
+        console.warn("No accessory orders returned from the server.");
+      }
+    } catch (err) {
+      console.error(
+        "Error fetching accessory purchases:",
+        err.response?.data || err.message
+      );
+      setError(
+        "Failed to load accessory orders: " +
+          (err.response?.data?.message || err.message)
+      );
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (!token && !localStorage.getItem("token")) {
+        setError("No authentication token found.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        await Promise.all([fetchDogPurchases(), fetchAccessoryPurchases()]);
+      } catch (err) {
+        setError("Failed to load orders: " + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadData();
+  }, [token]);
+
+  const renderDogsTable = (orders) => {
+    const filteredOrders = orders.filter((order) =>
+      order.transactionUuid.toLowerCase().includes(search.toLowerCase())
+    );
+    return (
+      <table className="w-full mt-4 border-collapse">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="p-2">Sno</th>
+            <th className="p-2">Image</th>
+            <th className="p-2">Dog ID</th>
+            <th className="p-2">Name</th>
+            <th className="p-2">Breed</th>
+            <th className="p-2">Amount (Rs.)</th>
+            <th className="p-2">Transaction ID</th>
+            <th className="p-2">Payment Status</th>
+            <th className="p-2">Delivery Status</th>
           </tr>
         </thead>
         <tbody>
-          {data.length > 0 ? (
-            data.map((item) => (
-              <tr key={item.id} className="border-b hover:bg-gray-50">
-                <td className="py-3 px-6 text-gray-800">{item.id}</td>
-                <td className="py-3 px-6 text-gray-800">{item.product}</td>
-                <td className="py-3 px-6 text-gray-500">{item.date}</td>
-                <td className="py-3 px-6 text-gray-500">{item.price}</td>
-                <td className="py-3 px-6">
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm ${
-                      item.status === "Delivered"
-                        ? "bg-green-500"
-                        : item.status === "Shipped"
-                        ? "bg-blue-500"
-                        : "bg-yellow-500"
-                    }`}
-                  >
-                    {item.status}
-                  </span>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" className="text-center py-4 text-gray-500">
-                No items found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
-  );
-
-  // Render Accessories table
-  const renderAccessoriesTable = (data) => (
-    <div className="overflow-x-auto bg-white shadow-lg rounded-lg mt-4">
-      <table className="min-w-full table-auto">
-        <thead className="bg-gray-200">
-          <tr>
-            <th className="py-3 px-4 text-left text-gray-700">S.No</th>
-            <th className="py-3 px-4 text-left text-gray-700">Order Number</th>
-            <th className="py-3 px-4 text-left text-gray-700">Image</th>
-            <th className="py-3 px-4 text-left text-gray-700">Product</th>
-            <th className="py-3 px-4 text-left text-gray-700">Price</th>
-            <th className="py-3 px-4 text-left text-gray-700">Colours</th>
-            <th className="py-3 px-4 text-left text-gray-700">Sizes</th>
-            <th className="py-3 px-4 text-left text-gray-700">
-              Delivery Status
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {data.length > 0 ? (
-            data.map((product, index) => (
-              <tr key={product.id} className="border-b hover:bg-gray-50">
-                {/* S.No */}
-                <td className="py-3 px-4 text-gray-800">{index + 1}</td>
-                {/* Order Number */}
-                <td className="py-3 px-4 text-gray-800">{product.id}</td>
-                {/* Image */}
-                <td className="py-3 px-4">
+          {filteredOrders.length ? (
+            filteredOrders.map((order, index) => (
+              <tr key={order._id.toString()} className="border-b">
+                <td className="p-2">{index + 1}</td>
+                <td className="p-2">
                   <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-16 h-16 object-cover rounded"
+                    src={order.image}
+                    alt={order.name}
+                    className="w-16 h-16 object-cover"
                   />
                 </td>
-                {/* Product Name */}
-                <td className="py-3 px-4 font-medium text-gray-800">
-                  {product.name}
-                </td>
-                {/* Price */}
-                <td className="py-3 px-4 text-gray-800">{product.price}</td>
-                {/* Colours */}
-                <td className="py-3 px-4">
-                  <div className="flex space-x-2">
-                    {product.colours.map((color) => (
-                      <span
-                        key={color}
-                        className="w-4 h-4 rounded-full border"
-                        style={{ backgroundColor: color }}
-                      ></span>
-                    ))}
-                  </div>
-                </td>
-                {/* Sizes */}
-                <td className="py-3 px-4">
-                  <div className="flex space-x-2">
-                    {product.sizes.map((size) => (
-                      <span
-                        key={size}
-                        className="px-2 py-1 border rounded text-xs"
-                      >
-                        {size}
-                      </span>
-                    ))}
-                  </div>
-                </td>
-                {/* Delivery Status */}
-                <td className="py-3 px-4 text-gray-800">
-                  <span
-                    className={`px-3 py-1 rounded-full text-white text-sm ${
-                      product.deliveryStatus === "Delivered"
-                        ? "bg-green-500"
-                        : product.deliveryStatus === "Shipped"
-                        ? "bg-blue-500"
-                        : "bg-yellow-500"
-                    }`}
-                  >
-                    {product.deliveryStatus}
-                  </span>
-                </td>
+                <td className="p-2">{order.dogId.toString()}</td>
+                <td className="p-2">{order.name}</td>
+                <td className="p-2">{order.breed}</td>
+                <td className="p-2">Rs. {order.amount}</td>
+                <td className="p-2">{order.transactionUuid}</td>
+                <td className="p-2">{order.status}</td>
+                <td className="p-2">{order.deliveryStatus}</td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center py-4 text-gray-500">
-                No products found.
+              <td colSpan="9" className="p-2 text-center">
+                No dog orders found.
               </td>
             </tr>
           )}
         </tbody>
       </table>
-    </div>
-  );
+    );
+  };
+
+  const renderAccessoriesTable = (orders) => {
+    const filteredOrders = orders.filter((order) =>
+      order.transactionUuid.toLowerCase().includes(search.toLowerCase())
+    );
+    return (
+      <table className="w-full mt-4 border-collapse">
+        <thead>
+          <tr className="bg-gray-200">
+            <th className="p-2">Sno</th>
+            <th className="p-2">Image</th>
+            <th className="p-2">Accessory ID</th>
+            <th className="p-2">Name</th>
+            <th className="p-2">Quantity</th>
+            <th className="p-2">Color</th>
+            <th className="p-2">Size</th>
+            <th className="p-2">Amount (Rs.)</th>
+            <th className="p-2">Transaction ID</th>
+            <th className="p-2">Payment Status</th>
+            <th className="p-2">Delivery Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {filteredOrders.length ? (
+            filteredOrders.map((order, index) => (
+              <tr key={order._id.toString()} className="border-b">
+                <td className="p-2">{index + 1}</td>
+                <td className="p-2">
+                  <img
+                    src={order.image}
+                    alt={order.name}
+                    className="w-16 h-16 object-cover"
+                  />
+                </td>
+                <td className="p-2">{order.accessoryId.toString()}</td>
+                <td className="p-2">{order.name}</td>
+                <td className="p-2">{order.quantity}</td>
+                <td className="p-2">{order.color || "N/A"}</td>
+                <td className="p-2">{order.size || "N/A"}</td>
+                <td className="p-2">Rs. {order.amount}</td>
+                <td className="p-2">{order.transactionUuid}</td>
+                <td className="p-2">{order.paymentStatus}</td>
+                <td className="p-2">{order.deliveryStatus}</td>
+              </tr>
+            ))
+          ) : (
+            <tr>
+              <td colSpan="11" className="p-2 text-center">
+                No accessory orders found.
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    );
+  };
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      {/* Header & Search */}
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-between">
-        <h2 className="text-3xl font-semibold text-gray-800 mb-4 md:mb-0">
-          My Orders
-        </h2>
-        <input
-          type="text"
-          placeholder={`Search ${
-            activeTab === "dogs" ? "Dogs" : "Accessories"
-          }`}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="p-2 w-60 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-        />
-      </div>
+      <h2 className="text-3xl font-semibold text-gray-800 mb-4">My Orders</h2>
+
+      {/* Search Input */}
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search by Transaction ID..."
+        className="mb-4 p-2 border rounded w-full max-w-md"
+      />
 
       {/* Tab Menu */}
       <div className="flex space-x-8 border-b border-gray-300">
         <span
-          onClick={() => {
-            setActiveTab("dogs");
-            setSearch("");
-          }}
+          onClick={() => setActiveTab("dogs")}
           className={`py-2 cursor-pointer ${
             activeTab === "dogs"
               ? "text-blue-500 border-b-2 border-blue-500"
@@ -241,10 +221,7 @@ export default function MyOrdersTabs() {
           Dogs
         </span>
         <span
-          onClick={() => {
-            setActiveTab("accessories");
-            setSearch("");
-          }}
+          onClick={() => setActiveTab("accessories")}
           className={`py-2 cursor-pointer ${
             activeTab === "accessories"
               ? "text-blue-500 border-b-2 border-blue-500"
@@ -255,10 +232,18 @@ export default function MyOrdersTabs() {
         </span>
       </div>
 
-      {/* Render the table based on active tab */}
-      {activeTab === "dogs"
-        ? renderDogsTable(filteredDogs)
-        : renderAccessoriesTable(filteredAccessories)}
+      {/* Render Tables */}
+      {loading ? (
+        <p className="text-lg text-gray-600 text-center mt-4">
+          Loading orders...
+        </p>
+      ) : error ? (
+        <p className="text-lg text-red-600 text-center mt-4">{error}</p>
+      ) : activeTab === "dogs" ? (
+        renderDogsTable(dogOrders)
+      ) : (
+        renderAccessoriesTable(accessoryOrders)
+      )}
     </div>
   );
 }

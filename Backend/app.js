@@ -40,7 +40,7 @@ app.use("/api/messages", messageRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/blogs", blogRoutes);
 app.use("/api/payments/dog-purchase", dogPurchaseRoutes);
-app.use("/api/payments/accessory-purchase", accessoryPurchaseRoutes);
+app.use("/api/payments/accessory-purchase", accessoryPurchaseRoutes); // Correct mounting
 app.use("/api/payments", paymentRoutes);
 
 // Error handling middleware
