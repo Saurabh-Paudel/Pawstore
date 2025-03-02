@@ -14,21 +14,25 @@ import {
 } from "react-icons/fa";
 import axios from "axios";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 
 const HomeBanner = () => {
   const [banners, setBanners] = useState([]);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isPaused, setIsPaused] = useState(false); // Track if the slider is paused
+  const [isPaused, setIsPaused] = useState(false); 
   const { token } = useSelector((state) => state.user);
 
   // Fetch banners from the backend
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/banners", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await axios.get(
+          "http://localhost:8000/api/banners/banners",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         setBanners(response.data.banners);
         setLoading(false);
       } catch (error) {
@@ -39,6 +43,8 @@ const HomeBanner = () => {
 
     if (token) {
       fetchBanners();
+    } else {
+      setLoading(false); 
     }
   }, [token]);
 
@@ -122,9 +128,11 @@ const HomeBanner = () => {
           <p className="text-lg mt-4 leading-[30px] md:leading-[35px] text-black max-w-[500px]">
             {banners[currentBanner].description}
           </p>
-          <button className="mt-6 bg-[#E58608] h-12 w-[120px] text-white text-[18px] font-medium rounded-full hover:bg-[#e58680] transition duration-300">
-            Buy Me
-          </button>
+          <Link to="/dog-sales">
+            <button className="mt-6 bg-[#E58608] h-12 w-[120px] text-white text-[18px] font-medium rounded-full hover:bg-[#e58680] transition duration-300">
+              Buy Me
+            </button>
+          </Link>
         </div>
       </div>
 

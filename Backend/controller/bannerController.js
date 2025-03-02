@@ -5,12 +5,14 @@ const fs = require("fs").promises;
 // Insert a new banner
 const createBanner = async (req, res) => {
   try {
+    console.log("Request body:", req.body);
+    console.log("Request files:", req.files);
 
-    const { title, description } = req.body;
-    if (!title || !description) {
+    const { name, title, description } = req.body; // Added name
+    if (!name || !title || !description) {
       return res
         .status(400)
-        .json({ message: "Title and description are required" });
+        .json({ message: "Name, title, and description are required" });
     }
     if (!req.files || !req.files.image) {
       return res.status(400).json({ message: "Image file is required" });
@@ -29,6 +31,7 @@ const createBanner = async (req, res) => {
     await image.mv(imagePath);
 
     const banner = new Banner({
+      name, // Added name
       title,
       description,
       image: `/BannerImages/${imageName}`,
@@ -50,14 +53,14 @@ const updateBanner = async (req, res) => {
     console.log("Request files:", req.files);
 
     const { id } = req.params;
-    const { title, description } = req.body;
+    const { name, title, description } = req.body; 
 
     const existingBanner = await Banner.findById(id);
     if (!existingBanner) {
       return res.status(404).json({ message: "Banner not found" });
     }
 
-    let updateData = { title, description };
+    let updateData = { name, title, description }; 
 
     if (req.files && req.files.image) {
       const oldImagePath = path.join(

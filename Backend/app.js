@@ -17,6 +17,7 @@ const dogPurchaseRoutes = require("./routes/dogPurchaseRoutes");
 const accessoryPurchaseRoutes = require("./routes/accessoryPurchaseRoutes");
 const paymentRoutes = require("./routes/paymentRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
+const contactRoutes = require("./routes/contactRoutes"); // Added import
 
 const app = express();
 
@@ -43,7 +44,8 @@ app.use("/api/blogs", blogRoutes);
 app.use("/api/payments/dog-purchase", dogPurchaseRoutes);
 app.use("/api/payments/accessory-purchase", accessoryPurchaseRoutes);
 app.use("/api/payments", paymentRoutes);
-app.use("/api", bannerRoutes);
+app.use("/api/banners", bannerRoutes);
+app.use("/api/contact", contactRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

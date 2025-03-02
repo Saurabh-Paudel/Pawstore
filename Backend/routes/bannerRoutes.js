@@ -22,18 +22,6 @@ router.post(
   createBanner
 );
 
-// Update a banner (PUT)
-router.put(
-  "/banners/:id",
-  authMiddleware,
-  [
-    body("title").notEmpty().withMessage("Title is required"),
-    body("description").notEmpty().withMessage("Description is required"),
-    // Removed image validation
-  ],
-  updateBanner
-);
-
 // Delete a banner (DELETE)
 router.delete("/banners/:id", authMiddleware, deleteBanner);
 

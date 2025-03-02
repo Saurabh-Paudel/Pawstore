@@ -1,15 +1,53 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useSelector } from "react-redux";
 
 export default function Contact() {
+  const { token } = useSelector((state) => state.user); // Get token from Redux
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
+  const [contactInfo, setContactInfo] = useState({
+    address: "",
+    phone: "",
+    email: "",
+  });
+  const [loading, setLoading] = useState(true);
+
+  // Fetch contact info on mount
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/contact/contact",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (response.data.contact) {
+          setContactInfo(response.data.contact);
+        }
+      } catch (error) {
+        toast.error(
+          "Failed to load contact info: " +
+            (error.response?.data?.message || error.message)
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchContactInfo();
+    } else {
+      setLoading(false); // If no token, proceed without fetching
+    }
+  }, [token]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -28,25 +66,29 @@ export default function Contact() {
         formData
       );
 
-      // Show success toast
       toast.success("Message sent successfully!", {
-        autoClose: 1500, // Close after 1.5 seconds
-        hideProgressBar: false, // Optional: Show progress bar for clarity
-        closeOnClick: true, // Allow manual close
-        pauseOnHover: true, // Pause timer on hover
+        autoClose: 1500,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
       });
 
       setFormData({ name: "", email: "", message: "" }); // Clear form
     } catch (error) {
-      // Show error toast
       toast.error("There was an error sending the message. Please try again.", {
-        autoClose: 1500, // Close after 1.5 seconds
+        autoClose: 1500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
       });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="text-center py-16">Loading contact information...</div>
+    );
+  }
 
   return (
     <div className="py-16 px-5 md:px-10 lg:px-[141px]">
@@ -62,19 +104,25 @@ export default function Contact() {
         <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-lg">
           <FaMapMarkerAlt className="text-[#E58608] text-4xl mb-3" />
           <h3 className="text-xl font-semibold text-black">Address</h3>
-          <p className="text-gray-600 mt-2">Mahendrapool, Pokhara, Nepal</p>
+          <p className="text-gray-600 mt-2">
+            {contactInfo.address || "Not available"}
+          </p>
         </div>
 
         <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-lg">
           <FaPhoneAlt className="text-[#E58608] text-4xl mb-3" />
           <h3 className="text-xl font-semibold text-black">Phone</h3>
-          <p className="text-gray-600 mt-2">+977-061-328463</p>
+          <p className="text-gray-600 mt-2">
+            {contactInfo.phone || "Not available"}
+          </p>
         </div>
 
         <div className="flex flex-col items-center bg-white p-6 rounded-xl shadow-lg">
           <FaEnvelope className="text-[#E58608] text-4xl mb-3" />
           <h3 className="text-xl font-semibold text-black">Email</h3>
-          <p className="text-gray-600 mt-2">info@pawsomecare.com</p>
+          <p className="text-gray-600 mt-2">
+            {contactInfo.email || "Not available"}
+          </p>
         </div>
       </div>
 
@@ -117,8 +165,8 @@ export default function Contact() {
 
       {/* Toast Container */}
       <ToastContainer
-        position="top-right" // Adjust position if needed
-        autoClose={1500} // Default timeout for toasts (matches your setting)
+        position="top-right"
+        autoClose={1500}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
@@ -126,7 +174,7 @@ export default function Contact() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        limit={1} // Prevent stacking of multiple toasts
+        limit={1}
       />
     </div>
   );

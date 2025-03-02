@@ -2,6 +2,11 @@ const mongoose = require("mongoose");
 
 const bannerSchema = new mongoose.Schema(
   {
+    name: {
+      type: String,
+      required: [true, "Banner name is required"],
+      trim: true,
+    },
     title: {
       type: String,
       required: [true, "Banner title is required"],
@@ -13,7 +18,7 @@ const bannerSchema = new mongoose.Schema(
       trim: true,
     },
     image: {
-      type: String, // Store image URL or path
+      type: String,
       required: [true, "Banner image is required"],
     },
   },

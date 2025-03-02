@@ -18,6 +18,7 @@ const GeneralSetting = () => {
   });
 
   const [bannerContent, setBannerContent] = useState({
+    name: "",
     title: "",
     description: "",
     image: null,
@@ -35,22 +36,36 @@ const GeneralSetting = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchBanners = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/banners", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setBanners(response.data.banners);
+        // Fetch banners
+        const bannerResponse = await axios.get(
+          "http://localhost:8000/api/banners/banners",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setBanners(bannerResponse.data.banners);
+
+        // Fetch contact info
+        const contactResponse = await axios.get(
+          "http://localhost:8000/api/contact/contact",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        if (contactResponse.data.contact) {
+          setContactInfo(contactResponse.data.contact);
+        }
       } catch (err) {
         toast.error(
-          "Failed to load banners: " +
-            (err.response?.data?.message || err.message)
+          "Failed to load data: " + (err.response?.data?.message || err.message)
         );
       }
     };
 
     if (token) {
-      fetchBanners();
+      fetchData();
       setPasswordData((prev) => ({ ...prev, userId }));
     }
   }, [token, userId]);
@@ -94,35 +109,36 @@ const GeneralSetting = () => {
   const handleBannerInsert = async (e) => {
     e.preventDefault();
     if (
+      !bannerContent.name ||
       !bannerContent.title ||
       !bannerContent.description ||
       !bannerContent.image
     ) {
-      toast.error("Please fill in all fields (title, description, image)!");
+      toast.error(
+        "Please fill in all fields (name, title, description, image)!"
+      );
       return;
     }
 
     const formData = new FormData();
+    formData.append("name", bannerContent.name);
     formData.append("title", bannerContent.title);
     formData.append("description", bannerContent.description);
-    formData.append("image", bannerContent.image); // Ensure this matches backend expectation
+    formData.append("image", bannerContent.image);
 
-    console.log("FormData contents:", Array.from(formData.entries())); // Debug form data
+    console.log("FormData contents:", Array.from(formData.entries()));
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/banners",
+        "http://localhost:8000/api/banners/banners",
         formData,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // Let axios set Content-Type automatically for multipart/form-data
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
       setBanners((prev) => [...prev, response.data.banner]);
       toast.success(response.data.message || "Banner added successfully!");
-      setBannerContent({ title: "", description: "", image: null });
+      setBannerContent({ name: "", title: "", description: "", image: null });
       setMessage("");
       setError("");
     } catch (err) {
@@ -136,7 +152,7 @@ const GeneralSetting = () => {
   const handleBannerDelete = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:8000/api/banners/${id}`,
+        `http://localhost:8000/api/banners/banners/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -150,12 +166,18 @@ const GeneralSetting = () => {
 
   const handleContactUpdate = async (e) => {
     e.preventDefault();
+    if (!contactInfo.address || !contactInfo.phone || !contactInfo.email) {
+      toast.error("Please fill in all contact fields (address, phone, email)!");
+      return;
+    }
+
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/settings/update-contact",
+        "http://localhost:8000/api/contact/contact",
         contactInfo,
         { headers: { Authorization: `Bearer ${token}` } }
       );
+      setContactInfo(response.data.contact);
       toast.success(
         response.data.message || "Contact info updated successfully!"
       );
@@ -261,6 +283,21 @@ const GeneralSetting = () => {
         <form onSubmit={handleBannerInsert} className="space-y-6">
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
+              Banner Name
+            </label>
+            <input
+              type="text"
+              name="name"
+              value={bannerContent.name}
+              onChange={(e) =>
+                setBannerContent({ ...bannerContent, name: e.target.value })
+              }
+              className="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+              required
+            />
+          </div>
+          <div className="flex flex-col space-y-2">
+            <label className="text-lg font-medium text-gray-700">
               Banner Title
             </label>
             <input
@@ -297,7 +334,7 @@ const GeneralSetting = () => {
             </label>
             <input
               type="file"
-              name="image" // Must match backend expectation (req.files.image)
+              name="image"
               accept="image/*"
               onChange={handleImageChange}
               className="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
@@ -337,8 +374,11 @@ const GeneralSetting = () => {
                     className="w-20 h-20 object-cover rounded"
                   />
                   <div className="flex-1">
-                    <p className="font-medium">{banner.title}</p>
-                    <p className="text-gray-600">{banner.description}</p>
+                    <p className="font-medium">Name: {banner.name}</p>
+                    <p className="font-medium">Title: {banner.title}</p>
+                    <p className="text-gray-600">
+                      Description: {banner.description}
+                    </p>
                   </div>
                   <button
                     onClick={() => handleBannerDelete(banner._id)}
