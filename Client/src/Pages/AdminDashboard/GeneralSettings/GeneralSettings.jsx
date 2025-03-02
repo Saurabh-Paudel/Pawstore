@@ -1,18 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { toast, ToastContainer } from "react-toastify"; // Import toast
-import "react-toastify/dist/ReactToastify.css"; // Toastify CSS
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const GeneralSetting = () => {
   const { token } = useSelector((state) => state.user);
   const decodedToken = token ? jwtDecode(token) : null;
-  const userId = decodedToken?.userId || ""; // Get userId from token
+  const userId = decodedToken?.userId || "";
 
-  // State for different sections
   const [passwordData, setPasswordData] = useState({
-    userId: userId, // Include userId from token
+    userId,
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -24,6 +23,8 @@ const GeneralSetting = () => {
     image: null,
   });
 
+  const [banners, setBanners] = useState([]);
+
   const [contactInfo, setContactInfo] = useState({
     address: "",
     phone: "",
@@ -33,12 +34,27 @@ const GeneralSetting = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  // Update userId in passwordData when token changes
   useEffect(() => {
-    setPasswordData((prev) => ({ ...prev, userId }));
-  }, [userId]);
+    const fetchBanners = async () => {
+      try {
+        const response = await axios.get("http://localhost:8000/api/banners", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setBanners(response.data.banners);
+      } catch (err) {
+        toast.error(
+          "Failed to load banners: " +
+            (err.response?.data?.message || err.message)
+        );
+      }
+    };
 
-  // Handle Password Change
+    if (token) {
+      fetchBanners();
+      setPasswordData((prev) => ({ ...prev, userId }));
+    }
+  }, [token, userId]);
+
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -52,7 +68,7 @@ const GeneralSetting = () => {
 
     try {
       const response = await axios.put(
-        "http://localhost:8000/api/account/change-password", // Correct endpoint
+        "http://localhost:8000/api/account/change-password",
         passwordData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -75,28 +91,63 @@ const GeneralSetting = () => {
     }
   };
 
-  // Handle Banner Content Update (unchanged)
-  const handleBannerUpdate = async (e) => {
+  const handleBannerInsert = async (e) => {
     e.preventDefault();
+    if (
+      !bannerContent.title ||
+      !bannerContent.description ||
+      !bannerContent.image
+    ) {
+      toast.error("Please fill in all fields (title, description, image)!");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("title", bannerContent.title);
+    formData.append("description", bannerContent.description);
+    formData.append("image", bannerContent.image); // Ensure this matches backend expectation
+
+    console.log("FormData contents:", Array.from(formData.entries())); // Debug form data
+
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/settings/update-banner",
-        bannerContent,
-        { headers: { Authorization: `Bearer ${token}` } }
+        "http://localhost:8000/api/banners",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            // Let axios set Content-Type automatically for multipart/form-data
+          },
+        }
       );
-      toast.success(response.data.message || "Banner updated successfully!");
+      setBanners((prev) => [...prev, response.data.banner]);
+      toast.success(response.data.message || "Banner added successfully!");
+      setBannerContent({ title: "", description: "", image: null });
       setMessage("");
       setError("");
     } catch (err) {
-      toast.error(
-        err.response?.data?.message || "Error updating banner content"
-      );
+      toast.error(err.response?.data?.message || "Error adding banner");
+      console.error("Error details:", err.response?.data);
       setMessage("");
       setError("");
     }
   };
 
-  // Handle Contact Info Update (unchanged)
+  const handleBannerDelete = async (id) => {
+    try {
+      const response = await axios.delete(
+        `http://localhost:8000/api/banners/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setBanners((prev) => prev.filter((banner) => banner._id !== id));
+      toast.success(response.data.message || "Banner deleted successfully!");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Error deleting banner");
+    }
+  };
+
   const handleContactUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -119,13 +170,12 @@ const GeneralSetting = () => {
     }
   };
 
-  // Handle Banner Image Change (unchanged)
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setBannerContent((prevContent) => ({
         ...prevContent,
-        image: URL.createObjectURL(file),
+        image: file,
       }));
     }
   };
@@ -142,7 +192,6 @@ const GeneralSetting = () => {
       <div className="bg-white p-6 shadow-lg rounded-lg">
         <h3 className="text-xl font-semibold mb-4">Change Password</h3>
         <form onSubmit={handlePasswordChange} className="space-y-6">
-          {/* Password Fields */}
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               Current Password
@@ -161,7 +210,6 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               New Password
@@ -180,7 +228,6 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               Confirm New Password
@@ -199,7 +246,6 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <button
             type="submit"
             className="w-full py-3 px-6 text-white bg-gray-600 rounded-lg shadow-lg hover:bg-gray-700 transition-all"
@@ -211,8 +257,8 @@ const GeneralSetting = () => {
 
       {/* Banner Content Section */}
       <div className="bg-white p-6 shadow-lg rounded-lg">
-        <h3 className="text-xl font-semibold mb-4">Update Banner Content</h3>
-        <form onSubmit={handleBannerUpdate} className="space-y-6">
+        <h3 className="text-xl font-semibold mb-4">Manage Banner Content</h3>
+        <form onSubmit={handleBannerInsert} className="space-y-6">
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               Banner Title
@@ -228,7 +274,6 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               Banner Description
@@ -246,36 +291,68 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
-              Banner Image (Optional)
+              Banner Image
             </label>
             <input
               type="file"
-              name="bannerImage"
+              name="image" // Must match backend expectation (req.files.image)
               accept="image/*"
               onChange={handleImageChange}
               className="p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+              required
             />
             {bannerContent.image && (
               <div className="mt-3">
                 <img
-                  src={bannerContent.image}
+                  src={URL.createObjectURL(bannerContent.image)}
                   alt="Banner Preview"
                   className="w-32 h-32 object-cover rounded-lg"
                 />
               </div>
             )}
           </div>
-
           <button
             type="submit"
             className="w-full py-3 px-6 text-white bg-green-600 rounded-lg shadow-lg hover:bg-green-700 transition-all"
           >
-            Update Banner
+            Add Banner
           </button>
         </form>
+
+        {/* Current Banners List */}
+        <div className="mt-6">
+          <h4 className="text-lg font-semibold mb-2">Current Banners</h4>
+          {banners.length > 0 ? (
+            <ul className="space-y-4">
+              {banners.map((banner) => (
+                <li
+                  key={banner._id}
+                  className="flex items-center space-x-4 border p-4 rounded-lg"
+                >
+                  <img
+                    src={`http://localhost:8000${banner.image}`}
+                    alt={banner.title}
+                    className="w-20 h-20 object-cover rounded"
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium">{banner.title}</p>
+                    <p className="text-gray-600">{banner.description}</p>
+                  </div>
+                  <button
+                    onClick={() => handleBannerDelete(banner._id)}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all"
+                  >
+                    Delete
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-gray-600">No banners found.</p>
+          )}
+        </div>
       </div>
 
       {/* Contact Info Section */}
@@ -297,7 +374,6 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               Phone Number
@@ -313,7 +389,6 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">Email</label>
             <input
@@ -327,7 +402,6 @@ const GeneralSetting = () => {
               required
             />
           </div>
-
           <button
             type="submit"
             className="w-full py-3 px-6 text-white bg-purple-600 rounded-lg shadow-lg hover:bg-purple-700 transition-all"
