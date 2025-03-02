@@ -1,59 +1,89 @@
-import React from "react";
-
-import Blog1 from "../../assets/BlogImages/Blog1.png";
-import Blog2 from "../../assets/BlogImages/Blog2.png";
-import Blog3 from "../../assets/BlogImages/Blog3.png";
-import Blog4 from "../../assets/BlogImages/Blog4.png";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom"; // Added for navigation
 
 export default function BlogSection() {
-  const Blogs = [
-    {
-      id: 1,
-      img: Blog1,
-      description: "Are you having trouble finding the right dog?",
-    },
-    {
-      id: 2,
-      img: Blog2,
-      description: "Is your dog aggresive towards your kids?",
-    },
-    {
-      id: 3,
-      img: Blog3,
-      description: "Looking for someone to train your dog?",
-    },
-    {
-      id: 4,
-      img: Blog4,
-      description: "Choose the most stylist and durable products for your dog.",
-    },
-  ];
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { token } = useSelector((state) => state.user);
+  const navigate = useNavigate(); // Hook for navigation
+
+  // Fetch blogs from the backend
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:8000/api/blogs/get",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        console.log("Blog fetch response:", response.data); // Debug the response
+        // Check if response.data is an array
+        if (Array.isArray(response.data)) {
+          setBlogs(response.data.slice(0, 4)); // Take only the first 4 blogs
+        } else {
+          console.warn("No valid blogs array in response:", response.data);
+          setBlogs([]); // Set empty array if no valid data
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching blogs:", error);
+        if (error.response) {
+          console.error("Error response data:", error.response.data); // Log server error details
+        }
+        setBlogs([]); // Set empty array on error
+        setLoading(false);
+      }
+    };
+
+    if (token) {
+      fetchBlogs();
+    } else {
+      setLoading(false); // Proceed without fetch if no token
+    }
+  }, [token]);
+
+  if (loading) {
+    return <div className="text-center my-20">Loading blogs...</div>;
+  }
+
+  if (blogs.length === 0) {
+    return <div className="text-center my-20">No blogs available.</div>;
+  }
 
   return (
     <div className="my-20 px-6 md:px-16 xl:px-[141px]">
       {/* Section Title */}
       <div className="text-center font-poppins mb-10">
-        <p className="text-4xl font-bold mb-4">Blog Section</p>
-        <p className="text-lg text-gray-700">Desctiprion of blog.</p>
+        <h2 className="text-4xl font-bold mb-4">Blog Section</h2>
+        <p className="text-lg text-gray-700">
+          Explore our latest dog care tips and stories.
+        </p>
       </div>
 
       {/* Blog List */}
       <div className="flex flex-wrap justify-center gap-6 sm:gap-10">
-        {Blogs.map((Blog) => (
+        {blogs.map((blog) => (
           <div
-            key={Blog.id}
-            className="flex flex-col h-[376px] w-[251px] rounded-[20px] shadow-lg"
+            key={blog._id}
+            className="flex flex-col h-[376px] w-[251px] rounded-[20px] shadow-lg cursor-pointer"
+            onClick={() => navigate(`/blog-details/${blog._id}`)} // Moved onClick here
           >
             <div className="w-[250px] h-[266px] rounded-[20px] overflow-hidden shadow-lg">
               <img
-                src={Blog.img}
-                alt="BlogImg.png"
+                src={`http://localhost:8000${blog.image}`}
+                alt={blog.title || "Blog Image"}
                 className="w-full h-full object-cover"
+                onError={(e) => (e.target.src = "/placeholder-image.jpg")} // Fallback image
               />
             </div>
             <div className="p-4 flex items-center justify-center">
-              <p className="text-base font-medium mt-2 text-center ">
-                {Blog.description}
+              <p className="text-base font-medium mt-2 text-center">
+                {blog.description
+                  ?.replace(/<[^>]+>/g, "") // Strip HTML tags
+                  .substring(0, 50) + "..."}
               </p>
             </div>
           </div>

@@ -25,6 +25,7 @@ export default function BlogDetail() {
     };
 
     fetchBlog();
+    window.scrollTo(0, 0);
   }, [id]);
 
   if (loading) {
