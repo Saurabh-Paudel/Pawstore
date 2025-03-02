@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { toast, ToastContainer } from "react-toastify"; // Import toast
+import "react-toastify/dist/ReactToastify.css"; // Toastify CSS
 
 const GeneralSetting = () => {
   const { token } = useSelector((state) => state.user);
+  const decodedToken = token ? jwtDecode(token) : null;
+  const userId = decodedToken?.userId || ""; // Get userId from token
 
   // State for different sections
   const [passwordData, setPasswordData] = useState({
+    userId: userId, // Include userId from token
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -15,7 +21,7 @@ const GeneralSetting = () => {
   const [bannerContent, setBannerContent] = useState({
     title: "",
     description: "",
-    image: null, // Store image URL for preview
+    image: null,
   });
 
   const [contactInfo, setContactInfo] = useState({
@@ -27,31 +33,49 @@ const GeneralSetting = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  // Update userId in passwordData when token changes
+  useEffect(() => {
+    setPasswordData((prev) => ({ ...prev, userId }));
+  }, [userId]);
+
   // Handle Password Change
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError("New passwords do not match!");
+      toast.error("New passwords do not match!");
       return;
     }
+    if (passwordData.newPassword.length < 6) {
+      toast.error("New password must be at least 6 characters long!");
+      return;
+    }
+
     try {
-      const response = await axios.post(
-        "http://localhost:8000/api/settings/change-password",
+      const response = await axios.put(
+        "http://localhost:8000/api/account/change-password", // Correct endpoint
         passwordData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMessage(response.data.message);
+      toast.success(response.data.message || "Password updated successfully!");
       setPasswordData({
+        userId,
         currentPassword: "",
         newPassword: "",
         confirmPassword: "",
       });
+      setMessage("");
+      setError("");
     } catch (err) {
-      setError("Error updating password");
+      toast.error(
+        err.response?.data?.error ||
+          "Error updating password. Please try again."
+      );
+      setMessage("");
+      setError("");
     }
   };
 
-  // Handle Banner Content Update
+  // Handle Banner Content Update (unchanged)
   const handleBannerUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -60,13 +84,19 @@ const GeneralSetting = () => {
         bannerContent,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMessage(response.data.message);
+      toast.success(response.data.message || "Banner updated successfully!");
+      setMessage("");
+      setError("");
     } catch (err) {
-      setError("Error updating banner content");
+      toast.error(
+        err.response?.data?.message || "Error updating banner content"
+      );
+      setMessage("");
+      setError("");
     }
   };
 
-  // Handle Contact Info Update
+  // Handle Contact Info Update (unchanged)
   const handleContactUpdate = async (e) => {
     e.preventDefault();
     try {
@@ -75,19 +105,27 @@ const GeneralSetting = () => {
         contactInfo,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMessage(response.data.message);
+      toast.success(
+        response.data.message || "Contact info updated successfully!"
+      );
+      setMessage("");
+      setError("");
     } catch (err) {
-      setError("Error updating contact information");
+      toast.error(
+        err.response?.data?.message || "Error updating contact information"
+      );
+      setMessage("");
+      setError("");
     }
   };
 
-  // Handle Banner Image Change
+  // Handle Banner Image Change (unchanged)
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setBannerContent((prevContent) => ({
         ...prevContent,
-        image: URL.createObjectURL(file), // Show image preview
+        image: URL.createObjectURL(file),
       }));
     }
   };
@@ -175,7 +213,6 @@ const GeneralSetting = () => {
       <div className="bg-white p-6 shadow-lg rounded-lg">
         <h3 className="text-xl font-semibold mb-4">Update Banner Content</h3>
         <form onSubmit={handleBannerUpdate} className="space-y-6">
-          {/* Title and Description */}
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               Banner Title
@@ -210,7 +247,6 @@ const GeneralSetting = () => {
             />
           </div>
 
-          {/* Banner Image Upload */}
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">
               Banner Image (Optional)
@@ -248,7 +284,6 @@ const GeneralSetting = () => {
           Update Contact Information
         </h3>
         <form onSubmit={handleContactUpdate} className="space-y-6">
-          {/* Contact Info Fields */}
           <div className="flex flex-col space-y-2">
             <label className="text-lg font-medium text-gray-700">Address</label>
             <input
@@ -301,6 +336,7 @@ const GeneralSetting = () => {
           </button>
         </form>
       </div>
+      <ToastContainer />
     </div>
   );
 };
