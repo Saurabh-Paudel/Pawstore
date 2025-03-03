@@ -30,7 +30,7 @@ const Blog = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
-        await axios.delete(`http://localhost:8000/api/blogs/delete/${id}`); // Fixed syntax
+        await axios.delete(`http://localhost:8000/api/blogs/delete/${id}`);
         setBlogs(blogs.filter((blog) => blog._id !== id));
         toast.success("Blog deleted successfully!");
       } catch (err) {
@@ -68,7 +68,7 @@ const Blog = () => {
       <ToastContainer position="top-right" autoClose={2000} />
       <h2 className="text-3xl font-semibold text-gray-800">Manage Blogs</h2>
 
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
         <Link to="/admin/blogs/insert">
           <button className="flex items-center space-x-2 text-white bg-gray-600 hover:bg-gray-700 px-5 py-2 rounded-lg shadow-md">
             <FaPlusCircle className="text-xl" />
@@ -84,7 +84,44 @@ const Blog = () => {
         />
       </div>
 
-      <div className="overflow-x-auto bg-white shadow-lg rounded-lg">
+      {/* Card Layout for Small Screens, Table for Larger Screens */}
+      <div className="sm:hidden">
+        <div className="grid gap-4 mt-4">
+          {filteredBlogs.length > 0 ? (
+            filteredBlogs.map((blog, index) => (
+              <div
+                key={blog._id}
+                className="p-4 bg-white shadow-md rounded-lg border border-gray-300"
+              >
+                <h3 className="text-xl font-semibold text-gray-800">
+                  {blog.title}
+                </h3>
+                <p className="text-gray-600">
+                  {blog.description.substring(0, 100)}...
+                </p>
+                <p className="text-gray-500">Status: {blog.status}</p>
+                <div className="flex space-x-3 mt-2">
+                  <Link to={`/admin/blogs/update/${blog._id}`}>
+                    <button className="text-yellow-500 hover:text-yellow-600">
+                      <FaEdit />
+                    </button>
+                  </Link>
+                  <button
+                    onClick={() => handleDelete(blog._id)}
+                    className="text-red-500 hover:text-red-600"
+                  >
+                    <FaTrashAlt />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <p className="text-center text-gray-500">No blogs found.</p>
+          )}
+        </div>
+      </div>
+
+      <div className="hidden sm:block overflow-x-auto bg-white shadow-lg rounded-lg mt-4">
         <table className="min-w-full table-auto">
           <thead className="bg-gray-200">
             <tr>

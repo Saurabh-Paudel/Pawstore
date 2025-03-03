@@ -8,7 +8,6 @@ const Messages = () => {
   const [showReplyBox, setShowReplyBox] = useState({});
 
   useEffect(() => {
-    // Fetch messages from the backend API
     const fetchMessages = async () => {
       try {
         const response = await axios.get("http://localhost:8000/api/messages");
@@ -17,7 +16,6 @@ const Messages = () => {
         console.error("Error fetching messages:", error);
       }
     };
-
     fetchMessages();
   }, []);
 
@@ -31,7 +29,7 @@ const Messages = () => {
   const handleDelete = async (id) => {
     try {
       await axios.delete(`http://localhost:8000/api/messages/${id}`);
-      setMessages(messages.filter((msg) => msg._id !== id)); // Remove the deleted message from state
+      setMessages(messages.filter((msg) => msg._id !== id));
     } catch (error) {
       console.error("Error deleting message:", error);
     }
@@ -40,16 +38,12 @@ const Messages = () => {
   const handleSendReply = async (id, reply) => {
     if (reply && reply.trim()) {
       try {
-        // Send the reply to the backend
         await axios.put(`http://localhost:8000/api/messages/${id}/reply`, {
           reply,
         });
-
-        // Update the local messages state to reflect the reply
         setMessages((prevMessages) =>
           prevMessages.map((msg) => (msg._id === id ? { ...msg, reply } : msg))
         );
-
         setShowReplyBox((prev) => ({ ...prev, [id]: false }));
       } catch (error) {
         console.error("Error sending reply:", error);
@@ -66,40 +60,23 @@ const Messages = () => {
 
   return (
     <div className="space-y-6 p-8 bg-gray-50 min-h-screen">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
         <h2 className="text-4xl font-semibold text-gray-800">
           Manage Messages
         </h2>
-        <div className="relative">
-          <input
-            type="search"
-            placeholder="Search Messages"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="p-3 w-72 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E58608] shadow-sm"
-          />
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="absolute top-3 right-3 text-gray-400"
-            width="18"
-            height="18"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zM20 20l-4-4"
-            />
-          </svg>
-        </div>
+        <input
+          type="search"
+          placeholder="Search Messages"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="p-3 w-full md:w-72 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E58608] shadow-sm"
+        />
       </div>
 
-      <div className="overflow-x-auto bg-white rounded-lg shadow-xl mt-6">
+      {/* Responsive Table / Card View */}
+      <div className="hidden lg:block bg-white rounded-lg shadow-xl overflow-x-auto">
         <table className="min-w-full table-auto text-center text-sm">
-          <thead className="bg-[#E58608] text-white">
+          <thead className="bg-gray-700 text-white">
             <tr>
               <th className="py-3 px-6">S.No</th>
               <th className="py-3 px-6">Name</th>
@@ -112,61 +89,29 @@ const Messages = () => {
           <tbody>
             {filteredMessages.length > 0 ? (
               filteredMessages.map((msg, index) => (
-                <tr
-                  key={msg._id}
-                  className="border-b hover:bg-gray-50 transition-all duration-300"
-                >
-                  <td className="py-4 px-6 text-gray-800">{index + 1}</td>
-                  <td className="py-4 px-6 text-gray-800">{msg.name}</td>
-                  <td className="py-4 px-6 text-gray-500">{msg.email}</td>
-                  <td className="py-4 px-6 text-gray-500">{msg.message}</td>
-
-                  {/* Reply Section */}
+                <tr key={msg._id} className="border-b hover:bg-gray-50">
+                  <td className="py-4 px-6">{index + 1}</td>
+                  <td className="py-4 px-6">{msg.name}</td>
+                  <td className="py-4 px-6">{msg.email}</td>
+                  <td className="py-4 px-6">{msg.message}</td>
                   <td className="py-4 px-6">
-                    <div className="space-y-4">
-                      {msg.reply ? (
-                        <div className="text-sm text-gray-600 italic">
-                          <strong>Replied:</strong> {msg.reply}
-                        </div>
-                      ) : showReplyBox[msg._id] ? (
-                        <>
-                          <textarea
-                            rows="3"
-                            placeholder="Write a reply..."
-                            className="w-full p-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#E58608] transition-all duration-300"
-                            id={`reply-${msg._id}`}
-                          />
-                          <button
-                            onClick={() =>
-                              handleSendReply(
-                                msg._id,
-                                document.getElementById(`reply-${msg._id}`)
-                                  .value
-                              )
-                            }
-                            className="py-2 px-6 bg-[#E58608] hover:bg-[#D87407] transition-all duration-300 text-white font-semibold rounded-lg shadow-md"
-                          >
-                            Send Reply
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => handleToggleReplyBox(msg._id)}
-                          className="py-2 px-6 bg-[#E58608] hover:bg-[#D87407] transition-all duration-300 text-white font-semibold rounded-lg shadow-md"
-                        >
-                          Reply
-                        </button>
-                      )}
-                    </div>
+                    {msg.reply ? (
+                      <span className="text-gray-600 italic">{msg.reply}</span>
+                    ) : (
+                      <button
+                        onClick={() => handleToggleReplyBox(msg._id)}
+                        className="py-2 px-4 bg-gray-700 text-white rounded-lg"
+                      >
+                        Reply
+                      </button>
+                    )}
                   </td>
-
-                  {/* Actions - Delete button */}
-                  <td className="py-4 px-6 flex justify-center">
+                  <td className="py-4 px-6">
                     <button
                       onClick={() => handleDelete(msg._id)}
-                      className="bg-red-600 hover:bg-red-700 text-white rounded-full p-2 transition duration-200 transform hover:scale-105"
+                      className="bg-red-600 text-white p-2 rounded-full"
                     >
-                      <FaTrashAlt className="text-lg" />
+                      <FaTrashAlt />
                     </button>
                   </td>
                 </tr>
@@ -180,6 +125,41 @@ const Messages = () => {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* Card View for Medium and Smaller Screens */}
+      <div className="lg:hidden space-y-4">
+        {filteredMessages.length > 0 ? (
+          filteredMessages.map((msg, index) => (
+            <div key={msg._id} className="bg-white p-4 rounded-lg shadow-md">
+              <p className="text-gray-800 font-semibold">
+                {index + 1}. {msg.name}
+              </p>
+              <p className="text-gray-500 text-sm">{msg.email}</p>
+              <p className="mt-2 text-gray-600">{msg.message}</p>
+              {msg.reply ? (
+                <p className="mt-2 text-gray-600 italic">Reply: {msg.reply}</p>
+              ) : (
+                <button
+                  onClick={() => handleToggleReplyBox(msg._id)}
+                  className="mt-2 py-2 px-4 bg-gray-700 text-white rounded-lg"
+                >
+                  Reply
+                </button>
+              )}
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={() => handleDelete(msg._id)}
+                  className="bg-red-600 text-white p-2 rounded-full"
+                >
+                  <FaTrashAlt />
+                </button>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="text-center text-gray-500">No messages found.</p>
+        )}
       </div>
     </div>
   );

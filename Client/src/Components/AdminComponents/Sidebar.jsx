@@ -76,6 +76,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaTachometerAlt className="text-xl" />
@@ -86,6 +87,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/dog"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaDog className="text-xl" />
@@ -96,6 +98,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/dog-breeds"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaPaw className="text-xl" />
@@ -106,6 +109,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/pet-products"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaBox className="text-xl" />
@@ -116,6 +120,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/blogs"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaBlogger className="text-xl" />
@@ -126,6 +131,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/newsletters"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaEnvelopeOpenText className="text-xl" />
@@ -136,6 +142,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/messages"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaCommentAlt className="text-xl" />
@@ -159,6 +166,7 @@ const Sidebar = ({ setUser }) => {
                 <li>
                   <Link
                     to="/admin/sales/dogs"
+                    onClick={closeSidebar} // Close sidebar when link is clicked
                     className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
                   >
                     <FaPaw className="text-xl" />
@@ -168,6 +176,7 @@ const Sidebar = ({ setUser }) => {
                 <li>
                   <Link
                     to="/admin/sales/accessories"
+                    onClick={closeSidebar} // Close sidebar when link is clicked
                     className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
                   >
                     <FaBox className="text-xl" />
@@ -180,6 +189,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/users"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaUserAlt className="text-xl" />
@@ -190,6 +200,7 @@ const Sidebar = ({ setUser }) => {
             <li>
               <Link
                 to="/admin/genral-settings"
+                onClick={closeSidebar} // Close sidebar when link is clicked
                 className="flex items-center space-x-3 hover:bg-gray-700 p-2 rounded"
               >
                 <FaCogs className="text-xl" />
