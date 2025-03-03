@@ -16,14 +16,14 @@ router.post("/initiate", authMiddleware, async (req, res) => {
       breed,
       name,
     } = req.body;
-    const userId = req.user._id; // Use ObjectId from middleware
+    const userId = req.user._id;
 
     if (
       !dogId ||
       !amount ||
       !transactionUuid ||
       !age ||
-      !vaccinated ||
+      vaccinated === undefined ||
       !image ||
       !breed ||
       !name
@@ -50,13 +50,16 @@ router.post("/initiate", authMiddleware, async (req, res) => {
       });
     }
 
+    // Convert vaccinated to Boolean
+    const vaccinatedBoolean = vaccinated === true || vaccinated === "Yes";
+
     const purchase = new DogPurchase({
       dogId,
       userId,
       amount,
       transactionUuid,
       age,
-      vaccinated,
+      vaccinated: vaccinatedBoolean,
       image,
       breed,
       name,

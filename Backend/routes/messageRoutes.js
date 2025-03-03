@@ -6,13 +6,15 @@ const {
   createMessage,
   getMessagesByEmail,
   replyToMessage,
+  deleteMessage, // Ensure deleteMessage is imported
 } = require("../controller/messageController");
 
 // Define Routes
-router.get("/", getAllMessages); // Get all messages
-router.get("/:id", getMessageById); // Get a message by ID
-router.post("/", createMessage); // Create a new message
-router.get("/email/:email", getMessagesByEmail); // Get messages by email
-router.put("/:id/reply", replyToMessage); // Reply to a message
+router.get("/", getAllMessages);
+router.get("/:id", getMessageById);
+router.post("/", createMessage);
+router.get("/email/:email", getMessagesByEmail);
+router.put("/:id/reply", replyToMessage);
+router.delete("/:id", deleteMessage);
 
 module.exports = router;

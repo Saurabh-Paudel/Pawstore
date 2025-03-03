@@ -77,10 +77,24 @@ const replyToMessage = async (req, res) => {
   }
 };
 
+// Delete a message
+const deleteMessage = async (req, res) => {
+  try {
+    const message = await Message.findByIdAndDelete(req.params.id);
+    if (!message) {
+      return res.status(404).json({ message: "Message not found" });
+    }
+    res.json({ message: "Message deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 module.exports = {
   getAllMessages,
   getMessageById,
   createMessage,
   getMessagesByEmail,
   replyToMessage,
+  deleteMessage,
 };

@@ -97,6 +97,35 @@ const Messages = () => {
                   <td className="py-4 px-6">
                     {msg.reply ? (
                       <span className="text-gray-600 italic">{msg.reply}</span>
+                    ) : showReplyBox[msg._id] ? (
+                      <div className="flex flex-col items-center">
+                        <input
+                          type="text"
+                          className="border border-gray-300 rounded-lg p-2 w-full"
+                          placeholder="Type your reply..."
+                          value={showReplyBox[msg._id]?.replyText || ""}
+                          onChange={(e) =>
+                            setShowReplyBox((prev) => ({
+                              ...prev,
+                              [msg._id]: {
+                                ...prev[msg._id],
+                                replyText: e.target.value,
+                              },
+                            }))
+                          }
+                        />
+                        <button
+                          onClick={() =>
+                            handleSendReply(
+                              msg._id,
+                              showReplyBox[msg._id]?.replyText
+                            )
+                          }
+                          className="mt-2 py-1 px-3 bg-green-600 text-white rounded-lg"
+                        >
+                          Send
+                        </button>
+                      </div>
                     ) : (
                       <button
                         onClick={() => handleToggleReplyBox(msg._id)}
