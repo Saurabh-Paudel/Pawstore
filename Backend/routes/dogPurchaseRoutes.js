@@ -82,10 +82,8 @@ router.post("/initiate", authMiddleware, async (req, res) => {
 //Get User's Dog Purchases
 router.get("/my-dog-purchases", authMiddleware, async (req, res) => {
   try {
-    const userId = req.user._id; // Use ObjectId from middleware
-    console.log("Fetching dog purchases for userId:", userId); // Debugging
+    const userId = req.user._id;
     const purchases = await DogPurchase.find({ userId });
-    console.log("Dog purchases found:", purchases); // Debugging
     res.status(200).json(purchases);
   } catch (error) {
     console.error("Error fetching user dog purchases:", error);

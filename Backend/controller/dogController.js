@@ -22,7 +22,7 @@ exports.getDogById = async (req, res) => {
   }
 };
 
-exports.createDog = async (req, res) => {
+exports.ononcreateDog = async (req, res) => {
   try {
     let imagePath = "";
     if (req.files && req.files.image) {

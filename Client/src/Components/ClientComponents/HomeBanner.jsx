@@ -20,7 +20,7 @@ const HomeBanner = () => {
   const [banners, setBanners] = useState([]);
   const [currentBanner, setCurrentBanner] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isPaused, setIsPaused] = useState(false); 
+  const [isPaused, setIsPaused] = useState(false);
   const { token } = useSelector((state) => state.user);
 
   // Fetch banners from the backend
@@ -28,10 +28,7 @@ const HomeBanner = () => {
     const fetchBanners = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/banners/banners",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          "http://localhost:8000/api/banners/banners"
         );
         setBanners(response.data.banners);
         setLoading(false);
@@ -40,13 +37,8 @@ const HomeBanner = () => {
         setLoading(false);
       }
     };
-
-    if (token) {
-      fetchBanners();
-    } else {
-      setLoading(false); 
-    }
-  }, [token]);
+    fetchBanners();
+  }, []);
 
   // Automatic slider effect
   useEffect(() => {

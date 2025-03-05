@@ -26,6 +26,6 @@ router.post(
 router.delete("/banners/:id", authMiddleware, deleteBanner);
 
 // Get all banners (GET)
-router.get("/banners", authMiddleware, getAllBanners);
+router.get("/banners", getAllBanners);
 
 module.exports = router;

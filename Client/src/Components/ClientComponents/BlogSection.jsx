@@ -13,37 +13,23 @@ export default function BlogSection() {
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/blogs/get",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        console.log("Blog fetch response:", response.data); // Debug the response
-        // Check if response.data is an array
+        const response = await axios.get("http://localhost:8000/api/blogs/get");
+
         if (Array.isArray(response.data)) {
-          setBlogs(response.data.slice(0, 4)); // Take only the first 4 blogs
+          setBlogs(response.data.slice(0, 4));
         } else {
-          console.warn("No valid blogs array in response:", response.data);
-          setBlogs([]); // Set empty array if no valid data
+          setBlogs([]);
         }
         setLoading(false);
       } catch (error) {
         console.error("Error fetching blogs:", error);
-        if (error.response) {
-          console.error("Error response data:", error.response.data); // Log server error details
-        }
-        setBlogs([]); // Set empty array on error
+        setBlogs([]);
         setLoading(false);
       }
     };
 
-    if (token) {
-      fetchBlogs();
-    } else {
-      setLoading(false); // Proceed without fetch if no token
-    }
-  }, [token]);
+    fetchBlogs();
+  }, []);
 
   if (loading) {
     return <div className="text-center my-20">Loading blogs...</div>;
