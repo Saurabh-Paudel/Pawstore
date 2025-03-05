@@ -29,6 +29,7 @@ import BuyNow from "./Pages/Client/BuyNow";
 import DogCheckout from "./Pages/Client/DogCheckout";
 import PaymentSuccess from "./Pages/Client/PaymentSuccess";
 import PaymentFailure from "./Pages/Client/PaymentFailure";
+import SearchResult from "./Pages/Client/SearchResult";
 
 // UserDashboard Pages
 import UserDashboard from "./Pages/UserDashboard/UserDashboard";
@@ -107,6 +108,7 @@ const App = () => {
         <Route path="/dog-checkout" element={<DogCheckout />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path="/payment-failure" element={<PaymentFailure />} />
+        <Route path="/search" element={<SearchResult />} />
       </Route>
 
       {userData.token && userData.role === "buyer" && (

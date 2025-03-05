@@ -16,12 +16,20 @@ import { logout } from "../../redux/slices/userSlice";
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
-  // Fetch user data from Redux store
   const user = useSelector((state) => state.user);
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+      setIsMenuOpen(false);
+    }
+  };
 
   const handleLogout = () => {
     dispatch(logout());
@@ -30,7 +38,6 @@ export default function Navbar() {
     navigate("/");
   };
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -41,7 +48,6 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Close menu after clicking a link
   const closeMenu = () => {
     setIsMenuOpen(false);
     document.body.style.overflow = "auto";
@@ -56,7 +62,6 @@ export default function Navbar() {
         </div>
       </Link>
 
-      {/* Desktop Menu */}
       <div className="hidden lg:flex items-center gap-x-6">
         <ul className="flex items-center gap-x-4 text-black">
           {[
@@ -75,25 +80,30 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Search Bar */}
-        <div className="relative hidden lg:flex items-center ml-4">
+        <form
+          onSubmit={handleSearch}
+          className="relative hidden lg:flex items-center ml-4"
+        >
           <input
             type="search"
-            placeholder="Search for pets..."
-            className="h-10 w-[200px] rounded-[20px] px-4 pr-10 bg-[#FFFDFA] border-none"
+            placeholder="Search for pets or products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-10 w-[250px] rounded-[20px] px-4 pr-10 bg-[#FFFDFA] border-none focus:outline-none focus:ring-2 focus:ring-[#FFD1A7] transition-all duration-200"
           />
-          <BiSearch className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-6 w-6" />
-        </div>
+          <button
+            type="submit"
+            className="absolute right-3 top-1/2 transform -translate-y-1/2"
+          >
+            <BiSearch className="text-gray-500 h-6 w-6 hover:text-[#FF8C38] transition-colors duration-200" />
+          </button>
+        </form>
 
-        {/* User Menu */}
         {user.token ? (
           <div ref={dropdownRef} className="relative">
             <span
               className="text-black text-lg cursor-pointer flex items-center"
-              onClick={() => {
-                console.log("Toggle dropdown");
-                setIsDropdownOpen(!isDropdownOpen);
-              }}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
               {user.username} <BiChevronDown className="ml-1 text-xl" />
             </span>
@@ -125,7 +135,6 @@ export default function Navbar() {
         )}
       </div>
 
-      {/* Mobile Menu Button */}
       <button
         className="md:flex lg:hidden z-50"
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -137,7 +146,6 @@ export default function Navbar() {
         )}
       </button>
 
-      {/* Mobile Menu */}
       <div
         className={`fixed top-0 left-0 w-full h-screen bg-[#FDEDD4] flex flex-col items-center pt-20 transform ${
           isMenuOpen ? "translate-x-0" : "-translate-x-full"
@@ -160,17 +168,22 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Search Bar (Mobile) */}
-        <div className="relative w-3/4 mt-4">
+        <form onSubmit={handleSearch} className="relative w-3/4 mt-4">
           <input
             type="search"
-            placeholder="Search for pets..."
-            className="h-10 w-full rounded-[20px] px-4 pr-12 bg-[#FFFDFA] border-none"
+            placeholder="Search for pets or products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="h-10 w-full rounded-[20px] px-4 pr-12 bg-[#FFFDFA] border-none focus:outline-none focus:ring-2 focus:ring-[#FFD1A7]"
           />
-          <BiSearch className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-500 h-6 w-6" />
-        </div>
+          <button
+            type="submit"
+            className="absolute top-1/2 right-3 transform -translate-y-1/2"
+          >
+            <BiSearch className="text-gray-500 h-6 w-6 hover:text-[#FF8C38]" />
+          </button>
+        </form>
 
-        {/* User Menu (Mobile) */}
         {user.token ? (
           <div className="mt-6 flex flex-col items-center gap-3">
             <Link

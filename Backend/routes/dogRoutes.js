@@ -1,4 +1,4 @@
-// backend/routes/dogRoutes.js
+// routes/dogRoutes.js
 const express = require("express");
 const {
   createDog,
@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.get("/", getAllDogs);
 router.get("/:id", getDogById);
-router.post("/", createDog);
+router.post("/", createDog); 
 router.put("/:id", updateDog);
 router.delete("/:id", deleteDog);
 

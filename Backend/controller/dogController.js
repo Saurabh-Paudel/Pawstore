@@ -6,9 +6,11 @@ const fs = require("fs");
 exports.getAllDogs = async (req, res) => {
   try {
     const dogs = await Dog.find();
-    res.json(dogs);
+    res.status(200).json(dogs);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching dogs", error: error.message });
   }
 };
 
@@ -16,95 +18,49 @@ exports.getDogById = async (req, res) => {
   try {
     const dog = await Dog.findById(req.params.id);
     if (!dog) return res.status(404).json({ message: "Dog not found" });
-    res.json(dog);
+    res.status(200).json(dog);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching dog", error: error.message });
   }
 };
 
-exports.ononcreateDog = async (req, res) => {
+exports.createDog = async (req, res) => {
   try {
-    let imagePath = "";
-    if (req.files && req.files.image) {
-      let image = req.files.image;
-      // Save images to Client/public/DogImages
-      const uploadDir = path.join(__dirname, "../../client/public/DogImages");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      const fileName = `${Date.now()}_${image.name}`;
-      const fullPath = path.join(uploadDir, fileName);
-      image.mv(fullPath, (err) => {
-        if (err) {
-          return res.status(500).json({ error: "Image upload failed" });
-        }
-      });
-      // Save relative path for serving via Express
-      imagePath = `/DogImages/${fileName}`;
-    }
-
-    const newDog = new Dog({ ...req.body, image: imagePath });
-    await newDog.save();
-    res.status(201).json(newDog);
+    const newDog = new Dog(req.body);
+    const savedDog = await newDog.save();
+    res.status(201).json(savedDog);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(400)
+      .json({ message: "Error creating dog", error: error.message });
   }
 };
 
 exports.updateDog = async (req, res) => {
   try {
-    const dog = await Dog.findById(req.params.id);
-    if (!dog) return res.status(404).json({ message: "Dog not found" });
-
-    let imagePath = dog.image;
-    if (req.files && req.files.image) {
-      // Delete old image if it exists
-      if (dog.image) {
-        // Check in both DogImages and uploads folders if needed
-        const oldImagePath = path.join(
-          __dirname,
-          "../../client/public",
-          dog.image
-        );
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlinkSync(oldImagePath);
-        }
-      }
-      // Save new image to a separate folder (uploads)
-      const uploadDir = path.join(__dirname, "../../client/public/uploads");
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      let image = req.files.image;
-      const fileName = `${Date.now()}_${image.name}`;
-      imagePath = `/uploads/${fileName}`;
-      image.mv(path.join(uploadDir, fileName));
-    }
-
-    const updatedDog = await Dog.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body, image: imagePath },
-      { new: true }
-    );
-    res.json(updatedDog);
+    const updatedDog = await Dog.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    if (!updatedDog) return res.status(404).json({ message: "Dog not found" });
+    res.status(200).json(updatedDog);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(400)
+      .json({ message: "Error updating dog", error: error.message });
   }
 };
 
 exports.deleteDog = async (req, res) => {
   try {
-    const dog = await Dog.findById(req.params.id);
-    if (!dog) return res.status(404).json({ message: "Dog not found" });
-    if (dog.image) {
-      const filePath = path.join(__dirname, "../../client/public", dog.image);
-      if (fs.existsSync(filePath)) {
-        fs.unlinkSync(filePath);
-      }
-    }
-    await Dog.findByIdAndDelete(req.params.id);
-    res.json({ message: "Dog deleted successfully" });
+    const deletedDog = await Dog.findByIdAndDelete(req.params.id);
+    if (!deletedDog) return res.status(404).json({ message: "Dog not found" });
+    res.status(200).json({ message: "Dog deleted successfully" });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting dog", error: error.message });
   }
 };
