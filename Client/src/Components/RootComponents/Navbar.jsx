@@ -22,6 +22,14 @@ export default function Navbar() {
   const dispatch = useDispatch();
   const user = useSelector((state) => state.user);
 
+  // Determine dashboard path based on user role
+  const dashboardPath =
+    user.token && user.role === "buyer"
+      ? "/dashboard"
+      : user.token && user.role === "admin"
+      ? "/admin"
+      : null;
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchQuery.trim()) {
@@ -109,13 +117,15 @@ export default function Navbar() {
             </span>
             {isDropdownOpen && (
               <div className="absolute top-12 right-0 bg-white shadow-lg rounded-md py-2 w-48 z-50">
-                <Link
-                  to="/dashboard"
-                  className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100"
-                  onClick={() => setIsDropdownOpen(false)}
-                >
-                  <AiOutlineDashboard className="h-5 w-5" /> Dashboard
-                </Link>
+                {dashboardPath && (
+                  <Link
+                    to={dashboardPath} // Dynamic dashboard path
+                    className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    onClick={() => setIsDropdownOpen(false)}
+                  >
+                    <AiOutlineDashboard className="h-5 w-5" /> Dashboard
+                  </Link>
+                )}
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-2 px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left"
@@ -186,13 +196,15 @@ export default function Navbar() {
 
         {user.token ? (
           <div className="mt-6 flex flex-col items-center gap-3">
-            <Link
-              to="/dashboard"
-              className="text-lg text-gray-700 hover:text-black flex items-center gap-2"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              <AiOutlineDashboard className="h-5 w-5" /> Dashboard
-            </Link>
+            {dashboardPath && (
+              <Link
+                to={dashboardPath} // Dynamic dashboard path
+                className="text-lg text-gray-700 hover:text-black flex items-center gap-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                <AiOutlineDashboard className="h-5 w-5" /> Dashboard
+              </Link>
+            )}
             <button
               onClick={handleLogout}
               className="text-lg text-gray-700 hover:text-black flex items-center gap-2"
