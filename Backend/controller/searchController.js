@@ -11,16 +11,18 @@ exports.searchAll = async (req, res) => {
         { name: { $regex: searchQuery, $options: "i" } },
         { breed: { $regex: searchQuery, $options: "i" } },
       ],
-    }).select("name breed age price image"); // 'image' is included
+    });
 
     const productsPromise = Product.find({
       $or: [
         { name: { $regex: searchQuery, $options: "i" } },
         { description: { $regex: searchQuery, $options: "i" } },
       ],
-    }).select("name price description image"); // 'image' is included
+    });
 
     const [dogs, products] = await Promise.all([dogsPromise, productsPromise]);
+
+    console.log("Fetched Dogs from DB:", dogs);
 
     res.status(200).json({
       success: true,

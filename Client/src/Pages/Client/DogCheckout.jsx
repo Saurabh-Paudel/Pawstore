@@ -18,6 +18,7 @@ export default function DogCheckout() {
   const navigate = useNavigate();
   const { dog } = location.state || {};
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   const userState = useSelector((state) => state.user);
   const token = userState.token;
@@ -32,16 +33,29 @@ export default function DogCheckout() {
     );
   }
 
-  const { _id: dogId, price, age, vaccinated, image, breed, name } = dog;
-  if (!dogId || !price || !age || !vaccinated || !image || !breed || !name) {
-    console.error("Missing dog data:", {
+  const {
+    _id: dogId,
+    price,
+    name,
+    age,
+    vaccinated,
+    image,
+    breed,
+    status,
+    description,
+  } = dog;
+
+  if (!dogId || !price || !name) {
+    console.error("Missing critical dog data:", {
       dogId,
       price,
+      name,
       age,
       vaccinated,
       image,
       breed,
-      name,
+      status,
+      description,
     });
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-amber-50 to-amber-100">
@@ -59,6 +73,7 @@ export default function DogCheckout() {
 
   const handlePayment = async () => {
     setLoading(true);
+    setErrorMessage(null);
     try {
       if (!token) {
         throw new Error("Please log in to complete the purchase");
@@ -121,7 +136,13 @@ export default function DogCheckout() {
     } catch (error) {
       console.error("Payment initiation error:", error.message);
       setLoading(false);
-      navigate("/payment-failure", { state: { error: error.message } });
+      if (error.message === "This dog is already in a pending transaction") {
+        setErrorMessage(
+          "Sorry, this dog is currently in a pending transaction. Please try again later or choose another dog."
+        );
+      } else {
+        navigate("/payment-failure", { state: { error: error.message } });
+      }
     }
   };
 
@@ -135,19 +156,39 @@ export default function DogCheckout() {
           <span className="mr-2">🐶</span> Adopt {name}!
         </h2>
 
+        {errorMessage && (
+          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
+            <p>{errorMessage}</p>
+            <button
+              onClick={() => navigate("/dog-sales")}
+              className="mt-2 text-sm text-red-700 underline hover:text-red-900"
+            >
+              Browse other dogs
+            </button>
+          </div>
+        )}
+
         <div className="space-y-6">
           <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
             <div className="flex items-center space-x-4">
               <div className="w-20 h-20 bg-amber-200 rounded-full flex items-center justify-center">
                 <img
-                  src={image}
+                  src={
+                    image?.startsWith("http")
+                      ? image
+                      : `http://localhost:8000${image || ""}`
+                  }
                   alt={name}
                   className="w-full h-full object-cover rounded-full"
+                  onError={(e) => {
+                    e.target.src =
+                      "https://via.placeholder.com/150?text=No+Image";
+                  }}
                 />
               </div>
               <div>
                 <p className="text-lg font-semibold text-gray-800">{name}</p>
-                <p className="text-amber-700">{breed}</p>
+                <p className="text-amber-700">{breed || "Unknown Breed"}</p>
                 <p className="text-xl font-bold text-amber-900 mt-1">
                   Rs. {price}
                 </p>

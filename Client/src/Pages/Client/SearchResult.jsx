@@ -32,7 +32,10 @@ const SearchResult = () => {
           })),
         ];
 
-        console.log("Fetched Results:", combinedResults); // Debug log
+        console.log(
+          "SearchResult Fetched Results:",
+          JSON.stringify(combinedResults, null, 2)
+        );
         setResults(combinedResults);
       } catch (err) {
         if (err.code === "ERR_NETWORK") {
@@ -72,17 +75,15 @@ const SearchResult = () => {
           ) : (
             results.map((item) =>
               item.type === "dog" ? (
-                // Dog Card
                 <div
                   key={item._id}
-                  onClick={() =>
+                  onClick={() => {
                     navigate(`/dog-sales/buy/${item._id}`, {
                       state: { dog: item },
-                    })
-                  }
+                    });
+                  }}
                   className="group bg-white rounded-lg shadow-lg p-5 cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-xl"
                 >
-                  {/* Dog Image */}
                   <div className="overflow-hidden rounded-lg">
                     <img
                       src={
@@ -98,8 +99,6 @@ const SearchResult = () => {
                       }}
                     />
                   </div>
-
-                  {/* Dog Info */}
                   <div className="text-center mt-4">
                     <h3 className="text-xl font-semibold text-gray-800">
                       {item.name}
@@ -111,15 +110,11 @@ const SearchResult = () => {
                   </div>
                 </div>
               ) : (
-                // Product Card
                 <div
                   key={item._id}
                   className="group h-[350px] w-[270px] border border-gray-300 shadow-md rounded-lg relative"
-                  onClick={() => {
-                    navigate(`/accessories-details/${item._id}`);
-                  }}
+                  onClick={() => navigate(`/accessories-details/${item._id}`)}
                 >
-                  {/* Product Image */}
                   <div className="relative h-[250px] w-full border-b rounded-t-lg border-gray-300 bg-[#F5F5F5]">
                     <img
                       src={
@@ -137,8 +132,6 @@ const SearchResult = () => {
                       Add to cart
                     </div>
                   </div>
-
-                  {/* Product Info */}
                   <div className="font-poppins text-center p-1">
                     <p className="text-base font-semibold text-gray-800">
                       {item.name}
@@ -149,8 +142,6 @@ const SearchResult = () => {
                       </span>
                     </div>
                   </div>
-
-                  {/* Hoverable Icons */}
                   <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col gap-2">
                     <div className="bg-white p-2 rounded-full flex items-center justify-center">
                       <FaRegHeart className="text-black cursor-pointer text-[20px]" />

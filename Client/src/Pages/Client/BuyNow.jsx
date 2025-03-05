@@ -1,3 +1,4 @@
+// Pages/Client/BuyNow.jsx
 import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -24,27 +25,30 @@ export default function BuyNow() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-white py-12 px-6 flex items-center justify-center">
       <div className="relative max-w-2xl w-full bg-white rounded-3xl shadow-lg p-8 transform transition-all duration-300 hover:shadow-xl border border-amber-100">
-        {/* Decorative Paw Prints */}
         <div className="absolute -top-6 -left-6 w-12 h-12 bg-amber-300 rounded-full opacity-20"></div>
         <div className="absolute -bottom-6 -right-6 w-16 h-16 bg-amber-200 rounded-full opacity-30"></div>
-
-        {/* Dog Image */}
         <div className="relative overflow-hidden rounded-2xl mb-6">
           <img
-            src={dog.image}
+            src={
+              dog.image?.startsWith("http")
+                ? dog.image
+                : `http://localhost:8000${dog.image || ""}`
+            }
             alt={dog.name}
             className="w-full h-80 object-cover transition-transform duration-500 hover:scale-105"
+            onError={(e) => {
+              e.target.src = "https://via.placeholder.com/150?text=No+Image";
+            }}
           />
           <div
             className={`absolute top-4 right-4 px-3 py-1 rounded-full text-white font-semibold text-sm ${
               dog.status === "Available" ? "bg-green-500" : "bg-red-500"
             }`}
           >
-            {dog.status}
+            {dog.status || "Unknown"}
           </div>
         </div>
 
-        {/* Dog Details */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
             <h2 className="text-4xl font-bold text-amber-800">{dog.name}</h2>
@@ -55,7 +59,8 @@ export default function BuyNow() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 bg-amber-50 p-4 rounded-xl border border-amber-200">
             <div className="space-y-2">
               <p className="text-gray-700">
-                <strong className="text-amber-900">Age:</strong> {dog.age} years
+                <strong className="text-amber-900">Age:</strong>{" "}
+                {dog.age || "N/A"} years
               </p>
               <p className="text-gray-700">
                 <strong className="text-amber-900">Vaccinated:</strong>{" "}
@@ -64,7 +69,11 @@ export default function BuyNow() {
                     dog.vaccinated === "Yes" ? "text-green-600" : "text-red-600"
                   }
                 >
-                  {dog.vaccinated === "Yes" ? "Yes ✅" : "No ❌"}
+                  {dog.vaccinated === "Yes"
+                    ? "Yes ✅"
+                    : dog.vaccinated === "No"
+                    ? "No ❌"
+                    : "N/A"}
                 </span>
               </p>
             </div>
@@ -75,10 +84,11 @@ export default function BuyNow() {
             </div>
           </div>
 
-          <p className="text-gray-600 leading-relaxed">{dog.description}</p>
+          <p className="text-gray-600 leading-relaxed">
+            {dog.description || "No description available"}
+          </p>
         </div>
 
-        {/* Action Buttons */}
         <div className="mt-8 flex gap-4">
           <button
             onClick={handleBuyNow}
@@ -96,7 +106,6 @@ export default function BuyNow() {
           </button>
         </div>
 
-        {/* Footer Note */}
         <p className="text-sm text-gray-500 mt-6 text-center">
           Bring {dog.name} home today! 🐾
         </p>

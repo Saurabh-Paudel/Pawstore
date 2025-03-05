@@ -1,3 +1,4 @@
+// routes/payments.js
 const express = require("express");
 const router = express.Router();
 const DogPurchase = require("../models/dogPurchaseModel");
@@ -5,21 +6,26 @@ const AccessoryPurchase = require("../models/accessoryPurchaseModel");
 const crypto = require("crypto");
 const authMiddleware = require("../middleware/auth");
 
-const secretKey = process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q";
-const productCode = process.env.ESEWA_PRODUCT_CODE || "EPAYTEST";
-const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+const secretKey = process.env.ESEWA_SECRET_KEY;
+const productCode = process.env.ESEWA_PRODUCT_CODE;
+const frontendUrl = process.env.FRONTEND_URL;
 
 // Dog Purchase Initiation
 router.post("/dog-purchase/initiate", authMiddleware, async (req, res) => {
   try {
-    const { dogId, amount, transactionUuid, age, vaccinated, image, breed } = req.body;
+    const { dogId, amount, transactionUuid, age, vaccinated, image, breed, name } = req.body;
     const userId = req.user._id || req.user.userId;
 
-    if (!dogId || !userId || !amount || !transactionUuid || !age || !vaccinated || !image || !breed) {
+    if (!dogId || !userId || !amount || !transactionUuid || !age || !vaccinated || !image || !breed || !name) {
       return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
-    const existingPurchase = await DogPurchase.findOne({ dogId, status: "PENDING" });
+    // Check for pending transactions within 30 minutes
+    const existingPurchase = await DogPurchase.findOne({
+      dogId,
+      status: "PENDING",
+      createdAt: { $gt: new Date(Date.now() - 30 * 60 * 1000) }, // 30-minute timeout
+    });
     if (existingPurchase) {
       return res.status(400).json({ success: false, message: "This dog is already in a pending transaction" });
     }
@@ -29,7 +35,16 @@ router.post("/dog-purchase/initiate", authMiddleware, async (req, res) => {
     }
 
     const purchase = new DogPurchase({
-      dogId, userId, amount, transactionUuid, age, vaccinated, image, breed, status: "PENDING",
+      dogId,
+      userId,
+      amount,
+      transactionUuid,
+      age,
+      vaccinated,
+      image,
+      breed,
+      name,
+      status: "PENDING",
     });
     await purchase.save();
     res.status(200).json({ success: true, transactionUuid });
@@ -54,8 +69,19 @@ router.post("/accessory-purchase/initiate", authMiddleware, async (req, res) => 
     }
 
     const purchase = new AccessoryPurchase({
-      accessoryId, userId, amount, transactionUuid, quantity, color, size, image, name, description, price,
-      paymentStatus: "PENDING", deliveryStatus: "Processing",
+      accessoryId,
+      userId,
+      amount,
+      transactionUuid,
+      quantity,
+      color,
+      size,
+      image,
+      name,
+      description,
+      price,
+      paymentStatus: "PENDING",
+      deliveryStatus: "Processing",
     });
     await purchase.save();
     res.status(200).json({ success: true, transactionUuid });
@@ -79,7 +105,6 @@ router.get("/payment-success", async (req, res) => {
       throw new Error("Missing required response fields from eSewa");
     }
 
-    // Verify signature
     const message = signed_field_names.split(",").map((field) => `${field}=${responseBody[field]}`).join(",");
     const computedSignature = crypto.createHmac("sha256", secretKey).update(message).digest("base64");
 
@@ -87,7 +112,6 @@ router.get("/payment-success", async (req, res) => {
       return res.redirect(`${frontendUrl}/payment-failure?reason=invalid_signature`);
     }
 
-    // Check both purchase types
     let purchase = await DogPurchase.findOneAndUpdate(
       { transactionUuid: transaction_uuid },
       { status: "COMPLETE", transactionCode: transaction_code },
@@ -114,7 +138,18 @@ router.get("/payment-success", async (req, res) => {
 });
 
 // Common Payment Failure Handler
-router.get("/payment-failure", (req, res) => {
+router.get("/payment-failure", async (req, res) => {
+  const { transaction_uuid } = req.query;
+  if (transaction_uuid) {
+    await DogPurchase.findOneAndUpdate(
+      { transactionUuid: transaction_uuid },
+      { status: "FAILED" }
+    );
+    await AccessoryPurchase.findOneAndUpdate(
+      { transactionUuid: transaction_uuid },
+      { paymentStatus: "FAILED" }
+    );
+  }
   res.redirect(`${frontendUrl}/payment-failure?reason=transaction_failed`);
 });
 
