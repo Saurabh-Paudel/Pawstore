@@ -13,6 +13,7 @@ const Signup = () => {
     role: "buyer",
   });
   const [errors, setErrors] = useState([]); // To store validation errors
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -22,7 +23,7 @@ const Signup = () => {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:8000/api/auth/signup", formData);
+      await axios.post(`${BACKEND_URL}/api/auth/signup`, formData);
 
       toast.success("Signup successful!", {
         position: "top-right",

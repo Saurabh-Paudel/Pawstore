@@ -16,11 +16,14 @@ export default function ProductDetail() {
   const [selectedSize, setSelectedSize] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await axios.get(`http://localhost:8000/api/products/get/${id}`);
+        const response = await axios.get(
+          `${BACKEND_URL}/api/products/get/${id}`
+        );
         const fetchedProduct = response.data;
         setProduct(fetchedProduct);
         setSelectedColor(fetchedProduct.colors?.[0] || null);
@@ -70,7 +73,11 @@ export default function ProductDetail() {
     <div className="flex flex-col lg:flex-row items-center lg:items-start p-4 lg:p-6 bg-gray-100 lg:min-h-auto">
       <div className="w-full lg:w-1/2 flex justify-center">
         <img
-          src={product.image.startsWith("http") ? product.image : `http://localhost:8000${product.image}`}
+          src={
+            product.image.startsWith("http")
+              ? product.image
+              : `${BACKEND_URL}${product.image}`
+          }
           alt={product.name}
           className="w-full max-w-xs md:max-w-md rounded-lg"
           onError={(e) => {
@@ -82,7 +89,9 @@ export default function ProductDetail() {
       <div className="w-full lg:w-1/2 p-4 lg:p-6 font-poppins text-center lg:text-left">
         <h1 className="text-xl md:text-2xl font-bold">{product.name}</h1>
         <p className="text-lg md:text-2xl font-semibold">Rs.{product.price}</p>
-        <p className="text-gray-600 mt-2 text-sm md:text-base">{product.description}</p>
+        <p className="text-gray-600 mt-2 text-sm md:text-base">
+          {product.description}
+        </p>
 
         <div className="mt-4 flex flex-wrap justify-center lg:justify-start gap-4 border-t pt-4">
           <p className="font-medium">Colours:</p>
@@ -90,7 +99,9 @@ export default function ProductDetail() {
             {product.colors.map((color) => (
               <button
                 key={color}
-                className={`w-5 h-5 rounded-full border ${selectedColor === color ? "ring-2 ring-black" : ""}`}
+                className={`w-5 h-5 rounded-full border ${
+                  selectedColor === color ? "ring-2 ring-black" : ""
+                }`}
                 style={{ backgroundColor: color.toLowerCase() }}
                 onClick={() => setSelectedColor(color)}
               ></button>
@@ -104,7 +115,9 @@ export default function ProductDetail() {
             {product.sizes.map((size) => (
               <button
                 key={size}
-                className={`px-3 py-1 border rounded ${selectedSize === size ? "bg-red-500 text-white" : ""}`}
+                className={`px-3 py-1 border rounded ${
+                  selectedSize === size ? "bg-red-500 text-white" : ""
+                }`}
                 onClick={() => setSelectedSize(size)}
               >
                 {size}
@@ -121,8 +134,13 @@ export default function ProductDetail() {
             >
               <FiMinus />
             </button>
-            <span className="px-4 w-12 flex items-center justify-center text-xl">{quantity}</span>
-            <button className="p-2 bg-gray-200 text-xl" onClick={() => setQuantity(quantity + 1)}>
+            <span className="px-4 w-12 flex items-center justify-center text-xl">
+              {quantity}
+            </span>
+            <button
+              className="p-2 bg-gray-200 text-xl"
+              onClick={() => setQuantity(quantity + 1)}
+            >
               <FiPlus />
             </button>
           </div>

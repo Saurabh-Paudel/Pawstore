@@ -18,17 +18,15 @@ export default function Contact() {
     email: "",
   });
   const [loading, setLoading] = useState(true);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch contact info on mount
   useEffect(() => {
     const fetchContactInfo = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/contact/contact",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/contact/contact`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (response.data.contact) {
           setContactInfo(response.data.contact);
         }
@@ -62,7 +60,7 @@ export default function Contact() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/messages",
+        `${BACKEND_URL}/api/messages`,
         formData
       );
 

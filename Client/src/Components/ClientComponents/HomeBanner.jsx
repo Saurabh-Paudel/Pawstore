@@ -22,18 +22,20 @@ const HomeBanner = () => {
   const [loading, setLoading] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const { token } = useSelector((state) => state.user);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch banners from the backend
   useEffect(() => {
     const fetchBanners = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/banners/banners"
+        const response = await axios.get(`${BACKEND_URL}/api/banners/banners`);
+        setBanners(
+          Array.isArray(response.data.banners) ? response.data.banners : []
         );
-        setBanners(response.data.banners);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching banners:", error);
+        setBanners([]);
         setLoading(false);
       }
     };
@@ -42,36 +44,37 @@ const HomeBanner = () => {
 
   // Automatic slider effect
   useEffect(() => {
-    if (banners.length <= 1 || isPaused) return; // No need to slide if 1 or fewer banners or paused
-
+    if (!Array.isArray(banners) || banners.length <= 1 || isPaused) return;
     const interval = setInterval(() => {
       setCurrentBanner((prev) => (prev + 1) % banners.length);
-    }, 5000); // Slide every 5 seconds
-
-    // Cleanup interval on unmount or when conditions change
+    }, 5000);
     return () => clearInterval(interval);
-  }, [banners.length, isPaused]);
+  }, [banners, isPaused]);
 
   // Handle Navigation with pause/resume
   const handleNext = () => {
+    if (!Array.isArray(banners) || banners.length === 0) return;
     setCurrentBanner((prev) => (prev + 1) % banners.length);
-    setIsPaused(true); // Pause on manual interaction
-    setTimeout(() => setIsPaused(false), 10000); // Resume after 10 seconds
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 10000);
   };
 
   const handlePrev = () => {
+    if (!Array.isArray(banners) || banners.length === 0) return;
     setCurrentBanner((prev) => (prev - 1 + banners.length) % banners.length);
-    setIsPaused(true); // Pause on manual interaction
-    setTimeout(() => setIsPaused(false), 10000); // Resume after 10 seconds
+    setIsPaused(true);
+    setTimeout(() => setIsPaused(false), 10000);
   };
 
   if (loading) {
     return <div>Loading banners...</div>;
   }
 
-  if (banners.length === 0) {
+  if (!Array.isArray(banners) || banners.length === 0) {
     return <div>No banners available.</div>;
   }
+
+  const safeCurrentBanner = currentBanner >= banners.length ? 0 : currentBanner;
 
   return (
     <section className="relative p-0 lg:pb-[100px] h-auto lg:h-auto bg-[#FDEDD4]">
@@ -89,8 +92,8 @@ const HomeBanner = () => {
             <img src={DogBg} alt="Background" className="w-full" />
             <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center">
               <img
-                src={`http://localhost:8000${banners[currentBanner].image}`}
-                alt={banners[currentBanner].title}
+                src={`${BACKEND_URL}${banners[safeCurrentBanner].image}`}
+                alt={banners[safeCurrentBanner].title}
                 className="w-[70%] lg:w-[80%] mx-auto object-contain"
               />
             </div>
@@ -103,7 +106,7 @@ const HomeBanner = () => {
               onClick={handlePrev}
             />
             <span className="text-2xl text-black font-poppins">
-              {banners[currentBanner].title}
+              {banners[safeCurrentBanner].title}
             </span>
             <LiaLongArrowAltRightSolid
               className="text-4xl cursor-pointer"
@@ -115,10 +118,10 @@ const HomeBanner = () => {
         {/* Right Side - Banner Description */}
         <div className="flex flex-col justify-center items-center lg:items-start text-center lg:text-left w-full lg:w-[50%] px-6 md:px-12 lg:px-0 my-8 lg:my-0">
           <h2 className="text-3xl md:text-4xl font-bold text-black">
-            {banners[currentBanner].title}
+            {banners[safeCurrentBanner].title}
           </h2>
           <p className="text-lg mt-4 leading-[30px] md:leading-[35px] text-black max-w-[500px]">
-            {banners[currentBanner].description}
+            {banners[safeCurrentBanner].description}
           </p>
           <Link to="/dog-sales">
             <button className="mt-6 bg-[#E58608] h-12 w-[120px] text-white text-[18px] font-medium rounded-full hover:bg-[#e58680] transition duration-300">

@@ -8,11 +8,12 @@ import "react-toastify/dist/ReactToastify.css";
 const DogBreed = () => {
   const [search, setSearch] = useState("");
   const [breeds, setBreeds] = useState([]);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchBreeds = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/breeds");
+        const response = await axios.get(`${BACKEND_URL}/api/breeds`);
         setBreeds(response.data);
       } catch (error) {
         console.error(
@@ -36,7 +37,7 @@ const DogBreed = () => {
     }
 
     try {
-      await axios.delete(`http://localhost:8000/api/breeds/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/breeds/${id}`);
       setBreeds((prevBreeds) => prevBreeds.filter((breed) => breed._id !== id));
       toast.success("Breed deleted successfully!");
     } catch (error) {

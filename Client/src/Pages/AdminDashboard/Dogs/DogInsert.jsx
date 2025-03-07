@@ -16,6 +16,7 @@ const DogInsert = () => {
     image: null,
     status: "Available",
   });
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   const [previewImage, setPreviewImage] = useState(null);
   const navigate = useNavigate();
 
@@ -39,7 +40,7 @@ const DogInsert = () => {
       formData.append(key, dog[key]);
     });
     try {
-      const response = await fetch("http://localhost:8000/api/dogs", {
+      const response = await fetch(`${BACKEND_URL}/api/dogs`, {
         method: "POST",
         body: formData,
       });

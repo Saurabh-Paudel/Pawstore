@@ -7,14 +7,12 @@ const PetProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   // Fetch products from the backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/products/get"
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/products/get`);
         setProducts(response.data);
         setLoading(false);
       } catch (err) {
@@ -31,7 +29,7 @@ const PetProducts = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this product?")) {
       try {
-        await axios.delete(`http://localhost:8000/api/products/delete/${id}`);
+        await axios.delete(`${BACKEND_URL}/api/products/delete/${id}`);
         setProducts(products.filter((product) => product._id !== id));
         alert("Product deleted successfully!");
       } catch (err) {
@@ -86,13 +84,20 @@ const PetProducts = () => {
                 Product Name
               </th>
               <th className="py-3 px-6 text-left text-gray-700">Price</th>
+              <th className="py-3 px-6 text-left text-gray-700">Description</th>
+              <th className="py-3 px-6 text-left text-gray-700">Image</th>
+              <th className="py-3 px-6 text-left text-gray-700">Colors</th>
+              <th className="py-3 px-6 text-left text-gray-700">Sizes</th>
+              <th className="py-3 px-6 text-left text-gray-700">
+                Stock Status
+              </th>
               <th className="py-3 px-6 text-left text-gray-700">Actions</th>
             </tr>
           </thead>
           <tbody>
             {products.length === 0 ? (
               <tr>
-                <td colSpan="4" className="py-3 px-6 text-center text-gray-500">
+                <td colSpan="9" className="py-3 px-6 text-center text-gray-500">
                   No products found.
                 </td>
               </tr>
@@ -103,6 +108,32 @@ const PetProducts = () => {
                   <td className="py-3 px-6 text-gray-800">{product.name}</td>
                   <td className="py-3 px-6 text-gray-500">
                     Rs.{product.price}
+                  </td>
+                  <td className="py-3 px-6 text-gray-500">
+                    {product.description}
+                  </td>
+                  <td className="py-3 px-6">
+                    <img
+                      src={
+                        product.image.startsWith("http")
+                          ? product.image
+                          : `${BACKEND_URL}${product.image}`
+                      }
+                      alt={product.name}
+                      className="w-16 h-16 object-cover"
+                      onError={(e) => {
+                        e.target.src = "https://via.placeholder.com/150"; // Fallback image
+                      }}
+                    />
+                  </td>
+                  <td className="py-3 px-6 text-gray-500">
+                    {product.colors?.join(", ") || "N/A"}
+                  </td>
+                  <td className="py-3 px-6 text-gray-500">
+                    {product.sizes?.join(", ") || "N/A"}
+                  </td>
+                  <td className="py-3 px-6 text-gray-500">
+                    {product.stockStatus}
                   </td>
                   <td className="py-3 px-6 space-x-3">
                     <Link to={`/admin/pet-products/update/${product._id}`}>
@@ -125,42 +156,91 @@ const PetProducts = () => {
       </div>
 
       {/* Card Format for smaller screens */}
-      <div className="grid sm:hidden grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
+      <div className="grid sm:hidden grid-cols-1 gap-6 mt-6">
         {products.length === 0 ? (
-          <p className="text-center text-gray-500">No products found.</p>
+          <p className="text-center text-gray-500 text-lg">
+            No products found.
+          </p>
         ) : (
           products.map((product) => (
             <div
               key={product._id}
-              className="bg-white p-4 rounded-lg shadow-lg hover:shadow-xl"
+              className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300"
             >
-              <img
-                src={
-                  product.image.startsWith("http")
-                    ? product.image
-                    : `http://localhost:8000${product.image}`
-                }
-                alt={product.name}
-                className="w-full h-48 object-cover rounded-lg"
-                onError={(e) => {
-                  e.target.src = "https://via.placeholder.com/150"; // Fallback image
-                }}
-              />
-              <h3 className="mt-3 text-lg font-semibold text-gray-800">
-                {product.name}
-              </h3>
-              <p className="mt-2 text-gray-500">Rs. {product.price}</p>
-              <div className="mt-3 flex space-x-3">
+              {/* Image */}
+              <div className="relative">
+                <img
+                  src={
+                    product.image.startsWith("http")
+                      ? product.image
+                      : `${BACKEND_URL}${product.image}`
+                  }
+                  alt={product.name}
+                  className="w-full h-56 object-cover rounded-lg"
+                  onError={(e) => {
+                    e.target.src = "https://via.placeholder.com/150"; // Fallback image
+                  }}
+                />
+                {/* Stock Status Badge */}
+                <span
+                  className={`absolute top-2 right-2 px-3 py-1 text-sm font-medium rounded-full text-white ${
+                    product.stockStatus === "In Stock"
+                      ? "bg-green-500"
+                      : "bg-red-500"
+                  }`}
+                >
+                  {product.stockStatus}
+                </span>
+              </div>
+
+              {/* Product Details */}
+              <div className="mt-4 space-y-2">
+                <h3 className="text-xl font-semibold text-gray-800">
+                  {product.name}
+                </h3>
+                <p className="text-gray-600 text-sm">{product.description}</p>
+                <p className="text-gray-700 font-medium">
+                  Rs. {product.price.toLocaleString()}
+                </p>
+
+                {/* Colors */}
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Colors:</p>
+                  <div className="flex gap-2 mt-1">
+                    {product.colors?.map((color, index) => (
+                      <span
+                        key={index}
+                        className="w-6 h-6 rounded-full border border-gray-300"
+                        style={{ backgroundColor: color }}
+                        title={color}
+                      ></span>
+                    )) || <span className="text-gray-400">N/A</span>}
+                  </div>
+                </div>
+
+                {/* Sizes */}
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Sizes:</p>
+                  <p className="text-gray-600 text-sm">
+                    {product.sizes?.join(", ") || "N/A"}
+                  </p>
+                </div>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-4 flex justify-between items-center">
                 <Link to={`/admin/pet-products/update/${product._id}`}>
-                  <button className="text-yellow-500 hover:text-yellow-600">
-                    <FaEdit />
+                  <button className="flex items-center space-x-1 text-yellow-600 hover:text-yellow-700 transition-colors">
+                    <FaEdit className="text-lg" />
+                    <span>Edit</span>
                   </button>
                 </Link>
                 <button
                   onClick={() => handleDelete(product._id)}
-                  className="text-red-500 hover:text-red-600"
+                  className="flex items-center space-x-1 text-red-600 hover:text-red-700 transition-colors"
                 >
-                  <FaTrashAlt />
+                  <FaTrashAlt className="text-lg" />
+                  <span>Delete</span>
                 </button>
               </div>
             </div>

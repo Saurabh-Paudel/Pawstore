@@ -5,11 +5,11 @@ import axios from "axios";
 export default function DogSales() {
   const [dogs, setDogs] = useState([]);
   const navigate = useNavigate();
-
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     const fetchDogs = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/dogs");
+        const response = await axios.get(`${BACKEND_URL}/api/dogs`);
         // Filter only available dogs
         const availableDogs = response.data.filter(
           (dog) => dog.status === "Available"

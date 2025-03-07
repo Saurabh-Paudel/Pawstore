@@ -3,11 +3,12 @@ import axios from "axios";
 
 export default function Breed() {
   const [breeds, setBreeds] = useState([]);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchBreeds = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/breeds");
+        const response = await axios.get(`${BACKEND_URL}/api/breeds`);
         const availableBreeds = response.data.filter(
           (breed) => breed.status === "Available"
         );

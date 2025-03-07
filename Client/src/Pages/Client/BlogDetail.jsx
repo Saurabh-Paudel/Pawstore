@@ -7,14 +7,13 @@ export default function BlogDetail() {
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch blog details from API on mount
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/blogs/get/${id}`
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/blogs/get/${id}`);
         setBlog(response.data);
         setLoading(false);
       } catch (err) {
@@ -64,7 +63,7 @@ export default function BlogDetail() {
             src={
               blog.image.startsWith("http")
                 ? blog.image
-                : `http://localhost:8000${blog.image}`
+                : `${BACKEND_URL}${blog.image}`
             }
             alt={blog.title}
             className="w-full h-[500px] object-cover rounded-xl shadow-md"

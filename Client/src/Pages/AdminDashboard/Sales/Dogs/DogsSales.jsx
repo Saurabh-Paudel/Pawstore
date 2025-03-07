@@ -11,6 +11,7 @@ const DogsSales = () => {
   const [error, setError] = useState(null);
   const [search, setSearch] = useState("");
   const { token, role } = useSelector((state) => state.user);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     if (!token) {
@@ -22,7 +23,7 @@ const DogsSales = () => {
     const fetchDogPurchases = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/payments/dog-purchase/dog-purchases",
+          `${BACKEND_URL}/api/payments/dog-purchase/dog-purchases`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setDogs(response.data);
@@ -57,7 +58,7 @@ const DogsSales = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/payments/dog-purchase/dog-purchases/${dogId}`,
+        `${BACKEND_URL}/api/payments/dog-purchase/dog-purchases/${dogId}`,
         { deliveryStatus: newStatus },
         { headers: { Authorization: `Bearer ${token}` } }
       );

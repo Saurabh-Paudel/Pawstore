@@ -12,6 +12,7 @@ export default function AccessoriesSales() {
   const [statusChanged, setStatusChanged] = useState({});
   const [search, setSearch] = useState(""); // Search input state
   const { token, role } = useSelector((state) => state.user);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     if (!token) {
@@ -23,7 +24,7 @@ export default function AccessoriesSales() {
     const fetchPurchases = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/payments/accessory-purchase/all-purchases",
+          `${BACKEND_URL}/api/payments/accessory-purchase/all-purchases`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -79,7 +80,7 @@ export default function AccessoriesSales() {
 
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/payments/accessory-purchase/accessory-purchases/${orderId}`,
+        `${BACKEND_URL}/api/payments/accessory-purchase/accessory-purchases/${orderId}`,
         { deliveryStatus: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` },

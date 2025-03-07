@@ -14,13 +14,12 @@ export default function UserDashboard() {
   const [accessoryOrders, setAccessoryOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch User Info
   const fetchUserInfo = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:8000/api/user/${email}`
-      );
+      const response = await axios.get(`${BACKEND_URL}/api/user/${email}`);
       setUserInfo(response.data);
     } catch (err) {
       setError("Failed to fetch user info: " + err.message);
@@ -31,7 +30,7 @@ export default function UserDashboard() {
   const fetchMessages = async () => {
     if (!email) return;
     try {
-      const response = await axios.get("http://localhost:8000/api/messages");
+      const response = await axios.get(`${BACKEND_URL}/api/messages`);
       const userMessages = response.data.filter((msg) => msg.email === email);
       setMessages(userMessages);
     } catch (err) {
@@ -43,7 +42,7 @@ export default function UserDashboard() {
   const fetchDogPurchases = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/payments/dog-purchase/my-dog-purchases",
+        `${BACKEND_URL}/api/payments/dog-purchase/my-dog-purchases`,
         {
           headers: {
             Authorization: `Bearer ${token || localStorage.getItem("token")}`,
@@ -60,7 +59,7 @@ export default function UserDashboard() {
   const fetchAccessoryPurchases = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/payments/accessory-purchase/my-purchases",
+        `${BACKEND_URL}/api/payments/accessory-purchase/my-purchases`,
         {
           headers: {
             Authorization: `Bearer ${token || localStorage.getItem("token")}`,

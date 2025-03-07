@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import CryptoJS from "crypto-js";
 
-const secretKey = "8gBm/:&EnhH.1/q"; // Matches .env ESEWA_SECRET_KEY
-const productCode = "EPAYTEST"; // Matches .env ESEWA_PRODUCT_CODE
+const secretKey = import.meta.env.VITE_ESEWA_SECRET_KEY;
+const productCode = import.meta.env.VITE_ESEWA_PRODUCT_CODE
 
 const generateSignature = (totalAmount, transactionUuid) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
@@ -18,6 +18,7 @@ export default function AccessoryCheckout() {
   const navigate = useNavigate();
   const { accessory } = location.state || {};
   const [loading, setLoading] = useState(false);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const userState = useSelector((state) => state.user);
   const token = userState.token;
@@ -66,7 +67,7 @@ export default function AccessoryCheckout() {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/payments/accessory-purchase/initiate",
+        `${BACKEND_URL}/api/payments/accessory-purchase/initiate`,
         {
           method: "POST",
           headers: {
@@ -105,8 +106,8 @@ export default function AccessoryCheckout() {
         product_code: productCode,
         product_service_charge: "0",
         product_delivery_charge: "0",
-        success_url: "http://localhost:8000/api/payments/payment-success",
-        failure_url: "http://localhost:8000/api/payments/payment-failure",
+        success_url: `${BACKEND_URL}/api/payments/payment-success`,
+        failure_url: `${BACKEND_URL}/api/payments/payment-failure`,
         signed_field_names: "total_amount,transaction_uuid,product_code",
         signature: generateSignature(totalAmount, transactionUuid),
       };

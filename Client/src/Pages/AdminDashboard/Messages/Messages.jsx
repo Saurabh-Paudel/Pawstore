@@ -6,11 +6,12 @@ const Messages = () => {
   const [search, setSearch] = useState("");
   const [messages, setMessages] = useState([]);
   const [showReplyBox, setShowReplyBox] = useState({});
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/messages");
+        const response = await axios.get(`${BACKEND_URL}/api/messages`);
         setMessages(response.data);
       } catch (error) {
         console.error("Error fetching messages:", error);
@@ -28,7 +29,7 @@ const Messages = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/messages/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/messages/${id}`);
       setMessages(messages.filter((msg) => msg._id !== id));
     } catch (error) {
       console.error("Error deleting message:", error);
@@ -38,7 +39,7 @@ const Messages = () => {
   const handleSendReply = async (id, reply) => {
     if (reply && reply.trim()) {
       try {
-        await axios.put(`http://localhost:8000/api/messages/${id}/reply`, {
+        await axios.put(`${BACKEND_URL}/api/messages/${id}/reply`, {
           reply,
         });
         setMessages((prevMessages) =>

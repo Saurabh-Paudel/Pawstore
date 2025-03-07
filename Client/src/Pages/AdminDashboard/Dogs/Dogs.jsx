@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 const Dogs = () => {
   const [search, setSearch] = useState("");
   const [dogs, setDogs] = useState([]);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchDogs = async () => {
@@ -27,7 +28,7 @@ const Dogs = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:8000/api/dogs/${id}`);
+      await axios.delete(`${BACKEND_URL}/api/dogs/${id}`);
       setDogs(dogs.filter((dog) => dog._id !== id));
     } catch (error) {
       console.error("Error deleting dog:", error);

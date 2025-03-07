@@ -34,13 +34,14 @@ const GeneralSetting = () => {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         // Fetch banners
         const bannerResponse = await axios.get(
-          "http://localhost:8000/api/banners/banners",
+          `${BACKEND_URL}/api/banners/banners`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -49,7 +50,7 @@ const GeneralSetting = () => {
 
         // Fetch contact info
         const contactResponse = await axios.get(
-          "http://localhost:8000/api/contact/contact",
+          `${BACKEND_URL}/api/contact/contact`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -83,7 +84,7 @@ const GeneralSetting = () => {
 
     try {
       const response = await axios.put(
-        "http://localhost:8000/api/account/change-password",
+        `${BACKEND_URL}/api/account/change-password`,
         passwordData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -130,7 +131,7 @@ const GeneralSetting = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/banners/banners",
+        `${BACKEND_URL}/api/banners/banners`,
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -152,7 +153,7 @@ const GeneralSetting = () => {
   const handleBannerDelete = async (id) => {
     try {
       const response = await axios.delete(
-        `http://localhost:8000/api/banners/banners/${id}`,
+        `${BACKEND_URL}/api/banners/banners/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -173,7 +174,7 @@ const GeneralSetting = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/contact/contact",
+        `${BACKEND_URL}/api/contact/contact`,
         contactInfo,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -369,7 +370,7 @@ const GeneralSetting = () => {
                   className="flex items-center space-x-4 border p-4 rounded-lg"
                 >
                   <img
-                    src={`http://localhost:8000${banner.image}`}
+                    src={`${BACKEND_URL}${banner.image}`}
                     alt={banner.title}
                     className="w-20 h-20 object-cover rounded"
                   />

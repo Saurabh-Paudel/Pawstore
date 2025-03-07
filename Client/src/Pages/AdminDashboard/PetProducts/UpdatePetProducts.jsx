@@ -21,13 +21,13 @@ const UpdatePetProduct = () => {
 
   const [previewImage, setPreviewImage] = useState(null); // Separate state for image preview
   const [colorInput, setColorInput] = useState("");
-
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
   // Fetch product data on mount
   useEffect(() => {
     const fetchProduct = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/products/get/${id}`
+          `${BACKEND_URL}/api/products/get/${id}`
         );
         const fetchedProduct = response.data;
         setProduct({
@@ -40,7 +40,7 @@ const UpdatePetProduct = () => {
           imageFile: null,
         });
         if (response.data.image) {
-          const imageUrl = `http://localhost:8000${response.data.image}`;
+          const imageUrl = `${BACKEND_URL}${response.data.image}`;
           setPreviewImage(imageUrl);
         }
       } catch (error) {
@@ -117,13 +117,9 @@ const UpdatePetProduct = () => {
         formData.append("image", product.imageFile); // Only append if new file is selected
       }
 
-      await axios.put(
-        `http://localhost:8000/api/products/update/${id}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      await axios.put(`${BACKEND_URL}/api/products/update/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       toast.success("Product updated successfully!"); // Success toast
       setTimeout(() => navigate("/admin/pet-products"), 2000); // Navigate after 2 seconds

@@ -21,18 +21,17 @@ const DogUpdate = () => {
   });
 
   const [previewImage, setPreviewImage] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchDog = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/dogs/${id}`
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/dogs/${id}`);
 
         setDog(response.data);
 
         if (response.data.image) {
-          const imageUrl = `http://localhost:8000${response.data.image}`;
+          const imageUrl = `${BACKEND_URL}${response.data.image}`;
           setPreviewImage(imageUrl);
         }
       } catch (error) {
@@ -71,7 +70,7 @@ const DogUpdate = () => {
 
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/dogs/${id}`,
+        `${BACKEND_URL}/api/dogs/${id}`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },

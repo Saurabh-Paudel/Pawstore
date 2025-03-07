@@ -10,6 +10,7 @@ export default function MyOrdersTabs() {
   const [accessoryOrders, setAccessoryOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const { token } = useSelector((state) => state.user);
   const decodedToken = token ? jwtDecode(token) : null;
@@ -18,7 +19,7 @@ export default function MyOrdersTabs() {
   const fetchDogPurchases = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/payments/dog-purchase/my-dog-purchases",
+        `${BACKEND_URL}/api/payments/dog-purchase/my-dog-purchases`,
         {
           headers: {
             Authorization: `Bearer ${token || localStorage.getItem("token")}`,
@@ -37,7 +38,7 @@ export default function MyOrdersTabs() {
   const fetchAccessoryPurchases = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/payments/accessory-purchase/my-purchases",
+        `${BACKEND_URL}/api/payments/accessory-purchase/my-purchases`,
         {
           headers: {
             Authorization: `Bearer ${token || localStorage.getItem("token")}`,

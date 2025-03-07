@@ -6,13 +6,12 @@ const User = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/user/users"
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/user/users`);
         setUsers(response.data);
       } catch (err) {
         console.error("Fetch error:", err.response?.data || err.message);

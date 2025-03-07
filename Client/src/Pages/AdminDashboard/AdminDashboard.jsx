@@ -18,6 +18,7 @@ const AdminDashboard = () => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const { token } = useSelector((state) => state.user);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,18 +39,18 @@ const AdminDashboard = () => {
           productSalesResponse,
           dogSalesResponse,
         ] = await Promise.all([
-          axios.get("http://localhost:8000/api/user/users"),
-          axios.get("http://localhost:8000/api/dogs"),
-          axios.get("http://localhost:8000/api/breeds"),
-          axios.get("http://localhost:8000/api/products/get"),
-          axios.get("http://localhost:8000/api/messages"),
-          axios.get("http://localhost:8000/api/newsletter/subscribers"),
+          axios.get(`${BACKEND_URL}/api/user/users`),
+          axios.get(`${BACKEND_URL}/api/dogs`),
+          axios.get(`${BACKEND_URL}/api/breeds`),
+          axios.get(`${BACKEND_URL}/api/products/get`),
+          axios.get(`${BACKEND_URL}/api/messages`),
+          axios.get(`${BACKEND_URL}/api/newsletter/subscribers`),
           axios.get(
-            "http://localhost:8000/api/payments/accessory-purchase/all-purchases",
+            `${BACKEND_URL}/api/payments/accessory-purchase/all-purchases`,
             { headers: { Authorization: `Bearer ${token}` } }
           ),
           axios.get(
-            "http://localhost:8000/api/payments/dog-purchase/dog-purchases", // Correct endpoint
+            `${BACKEND_URL}/api/payments/dog-purchase/dog-purchases`, // Correct endpoint
             { headers: { Authorization: `Bearer ${token}` } }
           ),
         ]);

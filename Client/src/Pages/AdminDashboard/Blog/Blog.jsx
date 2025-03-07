@@ -10,11 +10,12 @@ const Blog = () => {
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/blogs/get");
+        const response = await axios.get(`${BACKEND_URL}/api/blogs/get`);
         setBlogs(response.data);
         setLoading(false);
       } catch (err) {
@@ -30,7 +31,7 @@ const Blog = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this blog?")) {
       try {
-        await axios.delete(`http://localhost:8000/api/blogs/delete/${id}`);
+        await axios.delete(`${BACKEND_URL}/api/blogs/delete/${id}`);
         setBlogs(blogs.filter((blog) => blog._id !== id));
         toast.success("Blog deleted successfully!");
       } catch (err) {

@@ -9,6 +9,7 @@ export default function UserSettings() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Get token from Redux store
   const user = useSelector((state) => state.user);
@@ -34,7 +35,7 @@ export default function UserSettings() {
 
     try {
       const response = await axios.put(
-        "http://localhost:8000/api/account/change-password",
+        `${BACKEND_URL}/api/account/change-password`,
         { userId, currentPassword, newPassword, confirmPassword },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -59,7 +60,7 @@ export default function UserSettings() {
     try {
       // First, delete from userModel (users collection)
       const response = await axios.delete(
-        "http://localhost:8000/api/account/delete-account",
+        `${BACKEND_URL}/api/account/delete-account`,
         { data: { userId, email: user.email } },
         { headers: { Authorization: `Bearer ${token}` } }
       );

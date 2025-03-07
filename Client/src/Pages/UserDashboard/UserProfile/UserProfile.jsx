@@ -18,6 +18,7 @@ const UserProfile = () => {
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
   const [insertMode, setInsertMode] = useState(true);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -28,9 +29,7 @@ const UserProfile = () => {
     if (!email) return;
     const fetchUser = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/user/${email}`
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/user/${email}`);
         if (response.data) {
           setUserData(response.data);
           setFormData({ ...response.data, dob: formatDate(response.data.dob) });
@@ -53,7 +52,7 @@ const UserProfile = () => {
   const handleInsert = async () => {
     try {
       const response = await axios.post(
-        `http://localhost:8000/api/user/insert`,
+        `${BACKEND_URL}/api/user/insert`,
         formData
       );
       const insertedUser = response.data.user || response.data;
@@ -74,7 +73,7 @@ const UserProfile = () => {
   const handleSave = async () => {
     try {
       const response = await axios.put(
-        `http://localhost:8000/api/user/update/${email}`,
+        `${BACKEND_URL}/api/user/update/${email}`,
         formData
       );
       const updatedUser = response.data.user || response.data;

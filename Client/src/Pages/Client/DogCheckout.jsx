@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import CryptoJS from "crypto-js";
 
-const secretKey = "8gBm/:&EnhH.1/q";
-const productCode = "EPAYTEST";
+const secretKey = import.meta.env.VITE_ESEWA_SECRET_KEY; // Use environment variable
+const productCode = import.meta.env.VITE_ESEWA_PRODUCT_CODE; // Use environment variable
 
 const generateSignature = (totalAmount, transactionUuid) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
@@ -80,7 +80,9 @@ export default function DogCheckout() {
       }
 
       const response = await fetch(
-        "http://localhost:8000/api/payments/dog-purchase/initiate",
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/payments/dog-purchase/initiate`,
         {
           method: "POST",
           headers: {
@@ -117,8 +119,12 @@ export default function DogCheckout() {
         product_code: productCode,
         product_service_charge: "0",
         product_delivery_charge: "0",
-        success_url: "http://localhost:8000/api/payments/payment-success",
-        failure_url: "http://localhost:8000/api/payments/payment-failure",
+        success_url: `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/payments/payment-success`,
+        failure_url: `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/payments/payment-failure`,
         signed_field_names: "total_amount,transaction_uuid,product_code",
         signature: generateSignature(totalAmount, transactionUuid),
       };
@@ -136,59 +142,31 @@ export default function DogCheckout() {
     } catch (error) {
       console.error("Payment initiation error:", error.message);
       setLoading(false);
-      if (error.message === "This dog is already in a pending transaction") {
-        setErrorMessage(
-          "Sorry, this dog is currently in a pending transaction. Please try again later or choose another dog."
-        );
-      } else {
-        navigate("/payment-failure", { state: { error: error.message } });
-      }
+      setErrorMessage(error.message);
+      navigate("/payment-failure", { state: { error: error.message } });
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-amber-50 to-amber-100 flex items-center justify-center p-6">
       <div className="relative max-w-lg w-full bg-white rounded-2xl shadow-xl p-8 transform hover:scale-105 transition-all duration-300">
-        <div className="absolute -top-6 -left-6 w-12 h-12 bg-amber-400 rounded-full opacity-20"></div>
-        <div className="absolute -top-4 -left-4 w-8 h-8 bg-amber-500 rounded-full opacity-30"></div>
-
         <h2 className="text-3xl font-bold text-amber-800 mb-6 flex items-center">
-          <span className="mr-2">🐶</span> Adopt {name}!
+          <span className="mr-2">🐾</span> Purchase {name}!
         </h2>
-
-        {errorMessage && (
-          <div className="mb-6 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg">
-            <p>{errorMessage}</p>
-            <button
-              onClick={() => navigate("/dog-sales")}
-              className="mt-2 text-sm text-red-700 underline hover:text-red-900"
-            >
-              Browse other dogs
-            </button>
-          </div>
-        )}
 
         <div className="space-y-6">
           <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
             <div className="flex items-center space-x-4">
               <div className="w-20 h-20 bg-amber-200 rounded-full flex items-center justify-center">
                 <img
-                  src={
-                    image?.startsWith("http")
-                      ? image
-                      : `http://localhost:8000${image || ""}`
-                  }
+                  src={image}
                   alt={name}
                   className="w-full h-full object-cover rounded-full"
-                  onError={(e) => {
-                    e.target.src =
-                      "https://via.placeholder.com/150?text=No+Image";
-                  }}
                 />
               </div>
               <div>
                 <p className="text-lg font-semibold text-gray-800">{name}</p>
-                <p className="text-amber-700">{breed || "Unknown Breed"}</p>
+                <p className="text-amber-700">{description.slice(0, 30)}...</p>
                 <p className="text-xl font-bold text-amber-900 mt-1">
                   Rs. {price}
                 </p>
@@ -242,9 +220,9 @@ export default function DogCheckout() {
           </div>
         </div>
 
-        <p className="text-sm text-gray-500 mt-6 text-center">
-          Your new furry friend is just one click away! 🐾
-        </p>
+        {errorMessage && (
+          <p className="text-red-500 text-center mt-4">{errorMessage}</p>
+        )}
       </div>
     </div>
   );

@@ -9,13 +9,14 @@ const UserMessages = () => {
   const [search, setSearch] = useState("");
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     if (!userEmail) return;
 
     const fetchMessages = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/messages");
+        const response = await axios.get(`${BACKEND_URL}/api/messages`);
         const userMessages = response.data.filter(
           (msg) => msg.email === userEmail
         );

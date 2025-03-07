@@ -11,13 +11,14 @@ const SearchResult = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const query = new URLSearchParams(location.search).get("q");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchSearchResults = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get("http://localhost:8000/api/search", {
+        const response = await axios.get(`${BACKEND_URL}/api/search`, {
           params: { q: query },
         });
 
@@ -89,7 +90,7 @@ const SearchResult = () => {
                       src={
                         item.image?.startsWith("http")
                           ? item.image
-                          : `http://localhost:8000${item.image || ""}`
+                          : `${BACKEND_URL}${item.image || ""}`
                       }
                       alt={item.name}
                       className="w-full h-52 object-cover transition-transform duration-300 group-hover:scale-110"
@@ -120,7 +121,7 @@ const SearchResult = () => {
                       src={
                         item.image?.startsWith("http")
                           ? item.image
-                          : `http://localhost:8000${item.image || ""}`
+                          : `${BACKEND_URL}${item.image || ""}`
                       }
                       alt={item.name}
                       className="h-full w-full object-cover"

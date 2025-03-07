@@ -6,6 +6,7 @@ export default function BuyNow() {
   const location = useLocation();
   const navigate = useNavigate();
   const { dog } = location.state || {};
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   if (!dog) {
     return (
@@ -32,7 +33,7 @@ export default function BuyNow() {
             src={
               dog.image?.startsWith("http")
                 ? dog.image
-                : `http://localhost:8000${dog.image || ""}`
+                : `${BACKEND_URL}${dog.image || ""}`
             }
             alt={dog.name}
             className="w-full h-80 object-cover transition-transform duration-500 hover:scale-105"

@@ -8,14 +8,13 @@ export default function AccessoriesPage() {
   const [loading, setLoading] = useState(true); // Loading state
   const [error, setError] = useState(null); // Error state
   const navigate = useNavigate();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch products from the backend on mount
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:8000/api/products/get"
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/products/get`);
         setProducts(response.data);
         setLoading(false);
       } catch (err) {
@@ -78,7 +77,7 @@ export default function AccessoriesPage() {
                   src={
                     product.image.startsWith("http")
                       ? product.image
-                      : `http://localhost:8000${product.image}`
+                      : `${BACKEND_URL}${product.image}`
                   }
                   alt={product.name}
                   className="h-full w-full object-cover"

@@ -19,6 +19,7 @@ export default function InsertBlog() {
   const [tagInput, setTagInput] = useState("");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const handleChange = (e) => {
     setBlog({ ...blog, [e.target.name]: e.target.value });
@@ -64,7 +65,7 @@ export default function InsertBlog() {
     }
 
     try {
-      await axios.post("http://localhost:8000/api/blogs/insert", formData, {
+      await axios.post(`${BACKEND_URL}/api/blogs/insert`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       toast.success("Blog created successfully!");

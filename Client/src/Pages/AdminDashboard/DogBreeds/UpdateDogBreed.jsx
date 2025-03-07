@@ -12,15 +12,14 @@ const UpdateDogBreed = () => {
   const [imagePreview, setImagePreview] = useState("");
   const [status, setStatus] = useState("Available");
   const [description, setDescription] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchBreed = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/breeds/${id}`
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/breeds/${id}`);
         const breed = response.data;
         setBreedName(breed.name);
         setStatus(breed.status);
@@ -56,7 +55,7 @@ const UpdateDogBreed = () => {
         formData.append("image", imageFile);
       }
 
-      await axios.put(`http://localhost:8000/api/breeds/${id}`, formData, {
+      await axios.put(`${BACKEND_URL}/api/breeds/${id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },

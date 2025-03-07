@@ -6,6 +6,7 @@ export default function UserNewsletter() {
   const userEmail = useSelector((state) => state.user.email); // Get email from Redux
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [subscriptionDate, setSubscriptionDate] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch subscription status when email is available
   useEffect(() => {
@@ -14,7 +15,7 @@ export default function UserNewsletter() {
 
       try {
         const response = await axios.get(
-          `http://localhost:8000/api/newsletter/subscribers?email=${userEmail}`
+          `${BACKEND_URL}/api/newsletter/subscribers?email=${userEmail}`
         );
         if (response.data && response.data.length > 0) {
           setIsSubscribed(true);
@@ -45,7 +46,7 @@ export default function UserNewsletter() {
     if (isSubscribed) {
       try {
         await axios.delete(
-          `http://localhost:8000/api/newsletter/subscribe/${userEmail}`
+          `${BACKEND_URL}/api/newsletter/subscribe/${userEmail}`
         );
         setIsSubscribed(false);
         setSubscriptionDate("");
@@ -57,7 +58,7 @@ export default function UserNewsletter() {
     } else {
       try {
         const response = await axios.post(
-          "http://localhost:8000/api/newsletter/subscribe",
+          `${BACKEND_URL}/api/newsletter/subscribe`,
           { email: userEmail }
         );
         if (response.data.subscriber) {

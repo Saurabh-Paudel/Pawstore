@@ -4,13 +4,14 @@ import axios from "axios";
 
 const Newsletters = () => {
   const [subscribers, setSubscribers] = useState([]);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch subscribers from the API
   useEffect(() => {
     const fetchSubscribers = async () => {
       try {
         const response = await axios.get(
-          "http://localhost:8000/api/newsletter/subscribers"
+          `${BACKEND_URL}/api/newsletter/subscribers`
         );
 
         const data = response.data;
@@ -49,7 +50,7 @@ const Newsletters = () => {
       try {
         // Update the DELETE request to the correct API endpoint
         const response = await axios.delete(
-          `http://localhost:8000/api/newsletter/subscribe/${email}`
+          `${BACKEND_URL}/api/newsletter/subscribe/${email}`
         );
 
         if (response.status === 200) {

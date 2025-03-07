@@ -8,12 +8,15 @@ export default function BlogSection() {
   const [loading, setLoading] = useState(true);
   const { token } = useSelector((state) => state.user);
   const navigate = useNavigate(); // Hook for navigation
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch blogs from the backend
   useEffect(() => {
     const fetchBlogs = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/blogs/get");
+        const response = await axios.get(
+          `${BACKEND_URL}/api/blogs/get`
+        );
 
         if (Array.isArray(response.data)) {
           setBlogs(response.data.slice(0, 4));
@@ -59,7 +62,7 @@ export default function BlogSection() {
           >
             <div className="w-[250px] h-[266px] rounded-[20px] overflow-hidden shadow-lg">
               <img
-                src={`http://localhost:8000${blog.image}`}
+                src={`${BACKEND_URL}${blog.image}`}
                 alt={blog.title || "Blog Image"}
                 className="w-full h-full object-cover"
                 onError={(e) => (e.target.src = "/placeholder-image.jpg")} // Fallback image

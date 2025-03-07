@@ -17,6 +17,7 @@ const InsertPetProduct = () => {
 
   const [colorInput, setColorInput] = useState("");
   const navigate = useNavigate();
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   // Handle text inputs
   const handleChange = (e) => {
@@ -75,13 +76,13 @@ const InsertPetProduct = () => {
       const formData = new FormData();
       formData.append("name", product.name);
       formData.append("price", product.price);
-      formData.append("stockStatus", product.status); 
+      formData.append("stockStatus", product.status);
       formData.append("description", product.description);
       product.colors.forEach((color) => formData.append("colors", color));
       product.sizes.forEach((size) => formData.append("sizes", size)); // Already correct
       formData.append("image", product.imageFile);
 
-      await axios.post("http://localhost:8000/api/products/insert", formData, {
+      await axios.post(`${BACKEND_URL}/api/products/insert`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 

@@ -21,13 +21,12 @@ export default function UpdateBlog() {
   const [tagInput, setTagInput] = useState("");
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/api/blogs/get/${id}`
-        );
+        const response = await axios.get(`${BACKEND_URL}/api/blogs/get/${id}`);
         const fetchedBlog = response.data;
         setBlog({
           title: fetchedBlog.title,
@@ -37,7 +36,7 @@ export default function UpdateBlog() {
           status: fetchedBlog.status || "Draft",
         });
         if (fetchedBlog.image) {
-          setPreview(`http://localhost:8000${fetchedBlog.image}`);
+          setPreview(`${BACKEND_URL}${fetchedBlog.image}`);
         }
       } catch (error) {
         console.error("Error fetching blog:", error);
@@ -92,13 +91,9 @@ export default function UpdateBlog() {
     }
 
     try {
-      await axios.put(
-        `http://localhost:8000/api/blogs/update/${id}`,
-        formData,
-        {
-          headers: { "Content-Type": "multipart/form-data" },
-        }
-      );
+      await axios.put(`${BACKEND_URL}/api/blogs/update/${id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       toast.success("Blog updated successfully!");
       setTimeout(() => navigate("/admin/blogs"), 2000);
     } catch (error) {

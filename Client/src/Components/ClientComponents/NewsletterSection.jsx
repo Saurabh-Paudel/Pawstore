@@ -6,6 +6,7 @@ import Dog from "../../assets/dog.png";
 
 export default function NewsletterSection() {
   const [email, setEmail] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const handleSubscribe = async () => {
     if (!email) {
@@ -15,7 +16,7 @@ export default function NewsletterSection() {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/newsletter/subscribe",
+        `${BACKEND_URL}/api/newsletter/subscribe`,
         { email }
       );
 

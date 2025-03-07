@@ -11,6 +11,7 @@ const InsertDogBreed = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [status, setStatus] = useState("Available");
   const [description, setDescription] = useState("");
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
   const navigate = useNavigate();
 
@@ -32,15 +33,11 @@ const InsertDogBreed = () => {
         formData.append("image", imageFile);
       }
 
-      const response = await axios.post(
-        "http://localhost:8000/api/breeds",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+      const response = await axios.post(`${BACKEND_URL}/api/breeds`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
 
       toast.success("New Breed Added Successfully!");
       setTimeout(() => {
