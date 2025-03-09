@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import CryptoJS from "crypto-js";
 
 const secretKey = import.meta.env.VITE_ESEWA_SECRET_KEY;
-const productCode = import.meta.env.VITE_ESEWA_PRODUCT_CODE
+const productCode = import.meta.env.VITE_ESEWA_PRODUCT_CODE;
 
 const generateSignature = (totalAmount, transactionUuid) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;

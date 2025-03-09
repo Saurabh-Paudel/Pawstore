@@ -4,8 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import CryptoJS from "crypto-js";
 
-const secretKey = import.meta.env.VITE_ESEWA_SECRET_KEY; // Use environment variable
-const productCode = import.meta.env.VITE_ESEWA_PRODUCT_CODE; // Use environment variable
+const secretKey = import.meta.env.VITE_ESEWA_SECRET_KEY;
+const productCode = import.meta.env.VITE_ESEWA_PRODUCT_CODE;
 
 const generateSignature = (totalAmount, transactionUuid) => {
   const message = `total_amount=${totalAmount},transaction_uuid=${transactionUuid},product_code=${productCode}`;
@@ -66,9 +66,11 @@ export default function DogCheckout() {
     );
   }
 
-  const transactionUuid = `${Date.now()}-${Math.random()
-    .toString(36)
-    .slice(-9)}`;
+  const generateTransactionUuid = () =>
+    `${Date.now()}-${Math.random().toString(36).slice(-9)}`;
+  const [transactionUuid, setTransactionUuid] = useState(
+    generateTransactionUuid()
+  );
   const totalAmount = price.toString();
 
   const handlePayment = async () => {
@@ -107,44 +109,49 @@ export default function DogCheckout() {
         throw new Error(data.message || "Failed to initiate transaction");
       }
 
-      const form = document.createElement("form");
-      form.method = "POST";
-      form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
-
-      const fields = {
-        amount: totalAmount,
-        tax_amount: "0",
-        total_amount: totalAmount,
-        transaction_uuid: transactionUuid,
-        product_code: productCode,
-        product_service_charge: "0",
-        product_delivery_charge: "0",
-        success_url: `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/payments/payment-success`,
-        failure_url: `${
-          import.meta.env.VITE_BACKEND_URL
-        }/api/payments/payment-failure`,
-        signed_field_names: "total_amount,transaction_uuid,product_code",
-        signature: generateSignature(totalAmount, transactionUuid),
-      };
-
-      Object.entries(fields).forEach(([key, value]) => {
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = key;
-        input.value = value;
-        form.appendChild(input);
-      });
-
-      document.body.appendChild(form);
-      form.submit();
+      const paymentUuid = data.transactionUuid || transactionUuid;
+      submitPaymentForm(paymentUuid);
     } catch (error) {
       console.error("Payment initiation error:", error.message);
       setLoading(false);
       setErrorMessage(error.message);
       navigate("/payment-failure", { state: { error: error.message } });
     }
+  };
+
+  const submitPaymentForm = (uuid) => {
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "https://rc-epay.esewa.com.np/api/epay/main/v2/form";
+
+    const fields = {
+      amount: totalAmount,
+      tax_amount: "0",
+      total_amount: totalAmount,
+      transaction_uuid: uuid,
+      product_code: productCode,
+      product_service_charge: "0",
+      product_delivery_charge: "0",
+      success_url: `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/payments/payment-success`,
+      failure_url: `${
+        import.meta.env.VITE_BACKEND_URL
+      }/api/payments/payment-failure`,
+      signed_field_names: "total_amount,transaction_uuid,product_code",
+      signature: generateSignature(totalAmount, uuid),
+    };
+
+    Object.entries(fields).forEach(([key, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value;
+      form.appendChild(input);
+    });
+
+    document.body.appendChild(form);
+    form.submit();
   };
 
   return (
