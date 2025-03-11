@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { FaEye, FaEyeSlash, FaUser } from "react-icons/fa"; // Import icons
 
 const Signup = () => {
   const navigate = useNavigate();
@@ -12,10 +13,15 @@ const Signup = () => {
     password: "",
     role: "buyer",
   });
-  const [errors, setErrors] = useState([]); // To store validation errors
+  const [errors, setErrors] = useState([]);
+  const [showPassword, setShowPassword] = useState(false); // Toggle state for password
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
   };
 
   const handleSubmit = async (e) => {
@@ -23,16 +29,14 @@ const Signup = () => {
 
     try {
       await axios.post("http://localhost:8000/api/auth/signup", formData);
-
       toast.success("Signup successful!", {
         position: "top-right",
         autoClose: 3000,
       });
-
       setTimeout(() => navigate("/login"), 3000);
     } catch (error) {
       if (error.response?.data?.errors) {
-        setErrors(error.response.data.errors); // Store validation errors
+        setErrors(error.response.data.errors);
         error.response.data.errors.forEach((err) =>
           toast.error(err.msg, { position: "top-right" })
         );
@@ -47,8 +51,9 @@ const Signup = () => {
   return (
     <div className="flex min-h-screen items-center justify-center p-6">
       <div className="w-full max-w-md bg-white/90 backdrop-blur-lg shadow-2xl rounded-2xl p-8 border border-white/50">
-        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Create an Account ✨
+        <h2 className="text-3xl font-bold text-center text-gray-800 mb-6 flex items-center justify-center">
+          <FaUser className="mr-2 text-orange-500" size={28} /> Create an
+          Account ✨
         </h2>
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
@@ -64,11 +69,6 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your name"
             />
-            {errors.some((error) => error.param === "name") && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.find((error) => error.param === "name").msg}
-              </p>
-            )}
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">
@@ -83,30 +83,27 @@ const Signup = () => {
               className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
               placeholder="Enter your email"
             />
-            {errors.some((error) => error.param === "email") && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.find((error) => error.param === "email").msg}
-              </p>
-            )}
           </div>
-          <div>
+          <div className="relative">
             <label className="block text-gray-700 font-medium mb-2">
               Password
             </label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200"
+              className="w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-400 transition-all duration-200 pr-10"
               placeholder="Enter your password"
             />
-            {errors.some((error) => error.param === "password") && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.find((error) => error.param === "password").msg}
-              </p>
-            )}
+            {/* Eye icon for toggling password visibility */}
+            <span
+              className="absolute right-3 top-11 cursor-pointer text-gray-600"
+              onClick={togglePasswordVisibility}
+            >
+              {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
+            </span>
           </div>
           <div>
             <label className="block text-gray-700 font-medium mb-2">

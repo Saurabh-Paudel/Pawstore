@@ -48,7 +48,7 @@ const Sidebar = ({ setUser }) => {
     <div className="relative">
       {!isSidebarOpen && (
         <button
-          className="text-white bg-gray-800 p-3 fixed top-4 left-4 rounded-md z-50 md:hidden"
+          className="text-white bg-gray-800 p-3 fixed top-4 left-4 rounded-md z-[999] md:hidden"
           onClick={toggleSidebar}
         >
           <FaBars size={24} />

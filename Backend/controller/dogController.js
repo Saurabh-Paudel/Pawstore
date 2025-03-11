@@ -29,6 +29,8 @@ exports.getDogById = async (req, res) => {
 exports.createDog = async (req, res) => {
   try {
     const newDog = new Dog(req.body);
+    console.log("this is new dog", newDog);
+
     const savedDog = await newDog.save();
     res.status(201).json(savedDog);
   } catch (error) {

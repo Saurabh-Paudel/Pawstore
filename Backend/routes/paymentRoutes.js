@@ -43,7 +43,6 @@ router.get("/payment-success", async (req, res) => {
       .map((field) => `${field}=${responseBody[field]}`)
       .join(",");
 
-
     const computedSignature = crypto
       .createHmac("sha256", secretKey)
       .update(message)
@@ -85,6 +84,7 @@ router.get("/payment-success", async (req, res) => {
     res.redirect(
       `${frontendUrl}/payment-success?transactionId=${transaction_uuid}`
     );
+   
   } catch (error) {
     console.error("Payment success handling error:", error.message);
     res.redirect(
